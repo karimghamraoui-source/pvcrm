@@ -1,0 +1,768 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>PV-CRM</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0f2a4a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="PV-CRM">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-192.png">
+<style>
+:root{--navy:#0f2a4a;--navy2:#17375e;--bg:#f3f6fa;--card:#fff;--tx:#14233a;--mut:#64748b;--bd:#dbe3ee;--green:#22a06b;--green-d:#178556;--red:#d63a3a;--amber:#e08a00;--inp:#fff;--hov:#eef3f9}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#0b1626;--card:#122238;--tx:#e6edf6;--mut:#93a4bb;--bd:#24385a;--inp:#0e1c30;--hov:#18304f}}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--tx);padding-top:env(safe-area-inset-top,0px)}
+a{color:var(--green-d);text-decoration:none}a:hover{text-decoration:underline}
+#app{display:flex;min-height:100%}
+nav#side{width:220px;background:var(--navy);color:#fff;display:flex;flex-direction:column;position:sticky;top:0;height:100vh;flex-shrink:0}
+nav#side .logo{padding:18px 18px 14px;font-weight:700;font-size:18px;letter-spacing:.3px}nav#side .logo span{color:#5ee0a6}
+nav#side a{display:flex;gap:10px;align-items:center;color:#cfdcee;padding:11px 18px;text-decoration:none;border-left:3px solid transparent}
+nav#side a:hover{background:var(--navy2)}nav#side a.on{background:var(--navy2);color:#fff;border-left-color:#5ee0a6}
+nav#side a .n{margin-left:auto;background:var(--red);color:#fff;border-radius:10px;padding:0 7px;font-size:12px}
+#side .foot{margin-top:auto;padding:14px 18px;font-size:12px;color:#8fa6c4}
+#content{flex:1;min-width:0;display:flex;flex-direction:column}
+header#top{display:flex;align-items:center;gap:10px;padding:12px 20px;background:var(--card);border-bottom:1px solid var(--bd);position:sticky;top:env(safe-area-inset-top,0px);z-index:20;flex-wrap:wrap}
+header#top h1{font-size:20px;margin:0;margin-right:auto}
+main#main{padding:20px;max-width:1400px;width:100%}
+.pill{border-radius:12px;padding:2px 10px;font-size:12px;font-weight:600}
+.pill.on{background:#dcf5e9;color:#117a4d}.pill.off{background:#fde3e3;color:#a32121}
+.btn{border:1px solid var(--bd);background:var(--card);color:var(--tx);padding:8px 14px;border-radius:8px;cursor:pointer;font:inherit;display:inline-flex;gap:6px;align-items:center;text-decoration:none;min-height:38px}
+.btn:hover{background:var(--hov);text-decoration:none}
+.btn.pri{background:var(--green);border-color:var(--green);color:#fff}.btn.pri:hover{background:var(--green-d)}
+.btn.navy{background:var(--navy);border-color:var(--navy);color:#fff}.btn.ok{background:#e4f7ee;border-color:#a9e3c6;color:#0e6b43}
+.btn.dan{color:var(--red)}.btn.sm{padding:4px 9px;min-height:30px;font-size:13px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:16px}
+.card h2,.card h3{margin:0 0 10px;font-size:16px}
+.grid{display:grid;gap:14px}.kpis{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+.kpi{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:14px;display:block;color:inherit}
+.kpi:hover{text-decoration:none;border-color:var(--green)}.kpi b{display:block;font-size:26px;line-height:1.1}.kpi span{color:var(--mut);font-size:13px}.kpi.red b{color:var(--red)}.kpi.est{border-style:dashed}
+.two{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))}
+.muted{color:var(--mut)}.red{color:var(--red)}.sm{font-size:13px}
+.badge{display:inline-block;border-radius:10px;padding:1px 9px;font-size:12px;font-weight:600;color:#fff;background:var(--c,#64748b);white-space:nowrap}
+.tag{border:1px solid var(--bd);border-radius:8px;padding:0 6px;font-size:11px;color:var(--mut)}
+.row{display:flex;gap:10px;align-items:center;padding:10px 4px;border-bottom:1px solid var(--bd);flex-wrap:wrap}.row:last-child{border-bottom:0}
+.row.od{border-left:4px solid var(--red);padding-left:10px;background:rgba(214,58,58,.06)}.row.done{opacity:.6}
+.rmain{flex:1;min-width:200px}.racts{display:flex;gap:6px;flex-wrap:wrap;align-items:center}.rs{font-size:13px;color:var(--mut)}
+.prio-urgent{color:var(--red);font-weight:700}.prio-high{color:var(--amber);font-weight:700}
+table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--bd);vertical-align:middle}
+th{font-size:12px;text-transform:uppercase;color:var(--mut);letter-spacing:.4px;white-space:nowrap}tr:hover td{background:var(--hov)}
+.tw{overflow-x:auto}
+.bar{display:flex;align-items:center;gap:8px;margin:5px 0;font-size:13px}.bar i{display:block;height:14px;border-radius:7px;background:var(--c,var(--green));min-width:3px}.bar .l{width:150px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}
+input,select,textarea{font:inherit;border:1px solid var(--bd);border-radius:8px;padding:8px 10px;background:var(--inp);color:var(--tx);width:100%;min-height:38px}
+.filters input,.filters select{width:auto}input[type=checkbox]{width:auto;min-height:0}
+label.f{display:flex;flex-direction:column;gap:3px;font-size:13px;color:var(--mut)}label.f.chk{flex-direction:row;align-items:center;gap:8px}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-bottom:10px}.fg .w2{grid-column:1/-1}
+dialog{border:0;border-radius:14px;padding:0;width:min(720px,96vw);max-height:92vh;background:var(--card);color:var(--tx);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(8,20,38,.55)}
+dialog form{padding:18px;max-height:92vh;overflow:auto}dialog h2{margin:0 0 12px}
+details{border:1px solid var(--bd);border-radius:10px;padding:8px 12px;margin-bottom:10px}summary{cursor:pointer;font-weight:600}
+.err{color:var(--red);font-size:14px;margin:6px 0;min-height:1em}.warn{color:var(--amber);font-size:14px}
+.acts{display:flex;gap:8px;justify-content:flex-end;margin-top:12px;flex-wrap:wrap}
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--bd);margin-bottom:14px;overflow-x:auto}
+.tabs a{padding:9px 14px;color:var(--mut);border-bottom:3px solid transparent;margin-bottom:-2px;white-space:nowrap}.tabs a.on{color:var(--tx);border-bottom-color:var(--green);font-weight:600}
+.dl{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px 18px}.dl div span{display:block;font-size:12px;color:var(--mut)}
+.tl{border-left:2px solid var(--bd);margin-left:8px;padding-left:16px}.tl .it{position:relative;padding:6px 0 12px}.tl .it:before{content:"";position:absolute;left:-23px;top:11px;width:10px;height:10px;border-radius:5px;background:var(--green)}
+.kan{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px;align-items:flex-start}
+.col{min-width:230px;width:230px;background:var(--hov);border-radius:12px;padding:8px;flex-shrink:0}.col.over{outline:2px dashed var(--green)}
+.col h4{margin:4px 4px 8px;font-size:13px;display:flex;justify-content:space-between;gap:6px}
+.kc{background:var(--card);border:1px solid var(--bd);border-radius:10px;padding:9px;margin-bottom:8px;cursor:grab;font-size:13px}.kc select{margin-top:6px;min-height:30px;padding:3px 6px;font-size:12px}
+.cal7{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.cal7 .d{background:var(--card);border:1px solid var(--bd);border-radius:8px;min-height:92px;padding:5px;font-size:12px;overflow:hidden}
+.cal7 .d.today{border-color:var(--green);box-shadow:0 0 0 1px var(--green)}.cal7 .d.dim{opacity:.45}.cal7 .hd{font-weight:600;text-align:center;font-size:12px;color:var(--mut)}
+.chip{display:block;background:var(--c,#2b6cb0);color:#fff;border-radius:6px;padding:2px 5px;margin-top:3px;font-size:11px;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chip:hover{text-decoration:none;filter:brightness(1.1)}
+#toasts{position:fixed;right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px;z-index:100;max-width:min(380px,92vw)}
+.toast{background:var(--navy);color:#fff;border-left:4px solid var(--green);padding:10px 14px;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.3);cursor:pointer}.toast.error{border-left-color:var(--red)}.toast.info{border-left-color:#5aa7ff}
+#lock[hidden]{display:none!important}#lock{position:fixed;inset:0;background:var(--navy);z-index:200;display:flex;align-items:center;justify-content:center;color:#fff;flex-direction:column;gap:12px}
+.hint{background:var(--hov);border-radius:10px;padding:10px 12px;font-size:13px;margin:8px 0}
+.empty{text-align:center;color:var(--mut);padding:26px 10px}
+.demo{background:#fff3cd;color:#7a5b00;border-radius:6px;padding:0 6px;font-size:11px;font-weight:700}
+@media(max-width:860px){
+ #app{flex-direction:column}
+ nav#side{position:fixed;bottom:0;left:0;right:0;top:auto;width:100%;height:auto;flex-direction:row;overflow-x:auto;z-index:50;padding-bottom:env(safe-area-inset-bottom,0px)}
+ nav#side .logo,#side .foot{display:none}nav#side a{flex-direction:column;gap:0;padding:7px 12px;font-size:11px;border-left:0;border-top:3px solid transparent;flex:1;min-width:64px;text-align:center;position:relative}
+ nav#side a.on{border-top-color:#5ee0a6}nav#side a .n{position:absolute;top:2px;right:8px;margin:0;font-size:10px}
+ main#main{padding:12px 12px 90px}header#top{padding:8px 12px}.hm{display:none}.btn .lbl{display:none}
+ .cal7{grid-template-columns:1fr}.cal7 .hd{display:none}.cal7 .d.dim{display:none}.bar .l{width:100px}
+}
+@media print{nav#side,header#top{display:none}}
+</style>
+</head>
+<body>
+<div id="app">
+ <nav id="side"></nav>
+ <div id="content">
+  <header id="top"><h1 id="title">PV-CRM</h1><span id="net" class="pill on">online</span>
+   <button class="btn pri" data-act="newCustomer">＋ <span class="lbl">Neuer </span>Kunde</button>
+   <button class="btn" data-act="planCb">📞 <span class="lbl">Rückruf planen</span></button>
+   <button class="btn" data-act="newAppt">📅 <span class="lbl">Termin erstellen</span></button>
+  </header>
+  <main id="main"></main>
+ </div>
+</div>
+<div id="toasts"></div>
+<div id="lock" hidden></div>
+
+<script>
+'use strict';
+/* ============ Utilities ============ */
+const $=(s,e=document)=>e.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid=()=>(crypto.randomUUID?crypto.randomUUID():'id'+Date.now().toString(36)+Math.random().toString(36).slice(2,10));
+const pad=n=>String(n).padStart(2,'0');
+const ymd=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const today=()=>ymd(new Date());
+const addDays=(s,n)=>{const d=new Date(s+'T12:00');d.setDate(d.getDate()+n);return ymd(d)};
+const fDate=s=>s?s.split('-').reverse().join('.'):'';
+const fTs=ts=>{if(!ts)return '';const d=new Date(ts);return `${fDate(ymd(d))} ${pad(d.getHours())}:${pad(d.getMinutes())}`};
+const eur=n=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',maximumFractionDigits:0}).format(n||0);
+const num=v=>v===''||v==null?null:Number(String(v).replace(',','.'));
+const nowHM=()=>{const d=new Date();return pad(d.getHours())+':'+pad(d.getMinutes())};
+
+/* ============ IndexedDB ============ */
+const STORES=['customers','projects','tasks','appointments','activities','settings'];
+let db;
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open('pvcrm',1);
+ r.onupgradeneeded=()=>{STORES.forEach(s=>{if(!r.result.objectStoreNames.contains(s))r.result.createObjectStore(s,{keyPath:'id'})})};
+ r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);r.onblocked=()=>rej(new Error('DB blockiert'))})}
+const rq=r=>new Promise((res,rej)=>{r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)});
+const store=(s,m)=>db.transaction(s,m).objectStore(s);
+const dbAll=s=>rq(store(s,'readonly').getAll());
+const dbPut=(s,o)=>rq(store(s,'readwrite').put(o));
+const dbDel=(s,id)=>rq(store(s,'readwrite').delete(id));
+
+/* ============ State ============ */
+const KINDS={open:'laufend',won:'gewonnen',lost:'verloren',parked:'zurückgestellt'};
+const DEF_STATUSES=[['Neuer Lead','open','#3b82f6'],['Noch nicht kontaktiert','open','#64748b'],['Erstkontakt hergestellt','open','#0ea5e9'],['Nicht erreicht','open','#f59e0b'],['Rückruf vereinbart','open','#8b5cf6'],['Qualifizierung läuft','open','#06b6d4'],['Beratungstermin vereinbart','open','#14b8a6'],['Beratung durchgeführt','open','#10b981'],['Angebot wird erstellt','open','#84cc16'],['Angebot versendet','open','#eab308'],['Nachfassen nach Angebot','open','#f97316'],['Verhandlung','open','#ec4899'],['Auftrag gewonnen','won','#16a34a'],['Auftrag verloren','lost','#dc2626'],['Langfristig interessant','parked','#7c3aed'],['Kein Interesse','lost','#9ca3af']].map((x,i)=>({id:'s'+(i+1),name:x[0],kind:x[1],color:x[2]}));
+const DEF_PREFS={leadMin:15,dayTime:'08:30',overdueMin:0,quietOn:true,quietFrom:'20:00',quietTo:'07:00'};
+const S={customers:[],projects:[],tasks:[],appointments:[],activities:[],statuses:[],prefs:{},fired:{},meta:{},tomb:[]};
+async function load(){
+ for(const k of ['customers','projects','tasks','appointments','activities'])S[k]=await dbAll(k);
+ const m=Object.fromEntries((await dbAll('settings')).map(x=>[x.id,x.value]));
+ S.statuses=m.statuses||DEF_STATUSES;S.prefs={...DEF_PREFS,...(m.prefs||{})};S.fired=m.fired||{};S.meta=m.meta||{};S.tomb=m.tomb||[];
+ if(!m.statuses)await setSet('statuses',S.statuses);
+}
+const setSet=(id,value)=>dbPut('settings',{id,value,updatedAt:Date.now()});
+async function save(st,o){const now=Date.now();if(!o.id){o.id=uid();o.createdAt=now}o.updatedAt=now;await dbPut(st,o);await load();return o}
+async function remove(st,id){await dbDel(st,id);S.tomb.push({store:st,id,at:Date.now()});await setSet('tomb',S.tomb);await load()}
+async function log(customerId,type,text,result){await save('activities',{customerId,type,text:text||'',result:result||'',at:Date.now()})}
+
+/* ============ Domain helpers ============ */
+const st=id=>S.statuses.find(s=>s.id===id)||{id,name:'–',color:'#888',kind:'open'};
+const cust=id=>S.customers.find(c=>c.id===id);
+const cname=c=>c?([c.firstName,c.lastName].filter(Boolean).join(' ')||c.company||'(ohne Name)'):'(gelöscht)';
+const badge=id=>{const s=st(id);return `<span class="badge" style="--c:${esc(s.color)}">${esc(s.name)}</span>`};
+const PRIO={low:1,normal:2,high:3,urgent:4},PRIOL={low:'niedrig',normal:'normal',high:'hoch',urgent:'dringend'};
+const prioB=p=>p&&p!=='normal'?`<span class="prio-${p}">${PRIOL[p]}</span>`:'';
+const dueTs=t=>new Date(t.date+'T'+(t.time||'23:59')).getTime();
+const isOpen=t=>t.status==='open';
+const overdue=t=>isOpen(t)&&dueTs(t)<Date.now();
+const taskTitle=t=>t.kind==='callback'?`${t.contactType||'Anruf'}${t.reason?': '+t.reason:''}`:t.title;
+const CALL_RES=['Nicht erreicht','Erneuter Anruf gewünscht','Interesse vorhanden','Kein Interesse','Termin vereinbart','Angebot gewünscht','Bedenkzeit','Rückmeldung steht aus'];
+const RES2STATUS={'Nicht erreicht':'s4','Erneuter Anruf gewünscht':'s5','Interesse vorhanden':'s6','Kein Interesse':'s16','Termin vereinbart':'s7','Angebot gewünscht':'s9'};
+const SOURCES=['Empfehlung','Telefonakquise','Werbung','Website','Partner','Sonstiges'];
+const LOST=['Preis','Konkurrenz','Kein Interesse','Projekt verschoben','Nicht erreichbar','Sonstiges'];
+const APPT_T=['Erstberatung','Vor-Ort-Termin','Dachbesichtigung','Angebotsbesprechung','Nachfassgespräch','Vertragsabschluss'];
+const APPT_S=['geplant','bestätigt','durchgeführt','abgesagt','verschoben'];
+const APPT_C={geplant:'#2b6cb0',bestätigt:'#16a34a',durchgeführt:'#64748b',abgesagt:'#dc2626',verschoben:'#e08a00'};
+const OFFER_S=['Entwurf','Versendet','In Verhandlung','Gewonnen','Verloren'];
+const TRI=[['','–'],['ja','Ja'],['nein','Nein']];
+const normPhone=p=>{let d=(p||'').replace(/[^\d+]/g,'').replace(/^\+49/,'0').replace(/^0049/,'0');return d.replace(/\D/g,'')};
+const tel=p=>String(p||'').replace(/[^\d+]/g,'');
+const phoneLink=p=>p?`<a href="tel:${esc(tel(p))}">${esc(p)}</a>`:'';
+const apptStart=a=>new Date(a.date+'T'+(a.start||'00:00')).getTime();
+const activeAppt=a=>a.status==='geplant'||a.status==='bestätigt'||a.status==='verschoben';
+
+function derive(){
+ const m={};S.customers.forEach(c=>m[c.id]={nextCb:null,nextAppt:null,last:null,lastAny:c.createdAt||0,prio:0,od:false});
+ for(const t of S.tasks){const d=m[t.customerId];if(!d||!isOpen(t))continue;
+  d.prio=Math.max(d.prio,PRIO[t.priority]||2);if(overdue(t))d.od=true;
+  if(t.kind==='callback'&&(!d.nextCb||dueTs(t)<dueTs(d.nextCb)))d.nextCb=t}
+ for(const a of S.appointments){const d=m[a.customerId];if(!d||!activeAppt(a)||apptStart(a)<Date.now()-36e5)continue;if(!d.nextAppt||apptStart(a)<apptStart(d.nextAppt))d.nextAppt=a}
+ for(const a of S.activities){const d=m[a.customerId];if(!d)continue;d.lastAny=Math.max(d.lastAny,a.at);
+  if(['call','email','callback_done'].includes(a.type))d.last=Math.max(d.last||0,a.at)}
+ return m;
+}
+function lastResult(cid){let best=null;for(const a of S.activities)if(a.customerId===cid&&a.result&&(!best||a.at>best.at))best=a;return best?best.result:''}
+
+/* ============ UI helpers ============ */
+function toast(msg,type='ok',ms=4000,url){const t=document.createElement('div');t.className='toast '+type;t.textContent=msg;
+ t.onclick=()=>{t.remove();if(url)location.hash=url};$('#toasts').append(t);setTimeout(()=>t.remove(),ms)}
+function F(name,label,val,o={}){
+ const t=o.t||'text',req=o.req?' required':'';let inp;
+ if(t==='select')inp=`<select name="${name}"${req}>${(o.opts||[]).map(x=>{const[v,l]=Array.isArray(x)?x:[x,x];return `<option value="${esc(v)}"${String(v)===String(val??'')?' selected':''}>${esc(l)}</option>`}).join('')}</select>`;
+ else if(t==='textarea')inp=`<textarea name="${name}" rows="${o.rows||3}">${esc(val)}</textarea>`;
+ else if(t==='check')inp=`<input type="checkbox" name="${name}"${val?' checked':''}>`;
+ else inp=`<input type="${t}" name="${name}" value="${esc(val)}"${req}${o.step?` step="${o.step}"`:''}${o.min!=null?` min="${o.min}"`:''}${o.ph?` placeholder="${esc(o.ph)}"`:''}${o.inputmode?` inputmode="${o.inputmode}"`:''}>`;
+ return `<label class="f ${o.cls||''}${t==='check'?' chk':''}">${t==='check'?inp+'<span>'+label+'</span>':'<span>'+label+'</span>'+inp}</label>`;
+}
+function modal(title,body,onSubmit,o={}){
+ const d=document.createElement('dialog');
+ d.innerHTML=`<form method="dialog"><h2>${esc(title)}</h2>${body}<div class="err" role="alert"></div><div class="acts"><button type="button" class="btn" data-close>Abbrechen</button>${o.noSubmit?'':`<button class="btn pri" type="submit">${esc(o.ok||'Speichern')}</button>`}</div></form>`;
+ document.body.append(d);d.showModal();
+ const form=$('form',d),err=$('.err',d);d.addEventListener('close',()=>d.remove());
+ $('[data-close]',d).onclick=()=>d.close();
+ form.addEventListener('submit',async e=>{e.preventDefault();err.textContent='';
+  try{const r=await onSubmit(new FormData(form),form,err);if(r===false)return;d.close();if(o.after)o.after()}catch(ex){console.error(ex);err.textContent='Fehler: '+(ex.message||ex)}});
+ return d;
+}
+const custOpts=(withEmpty)=>[...(withEmpty?[['','– kein Kundenbezug –']]:[]),...S.customers.filter(c=>!c.archived).sort((a,b)=>cname(a).localeCompare(cname(b),'de')).map(c=>[c.id,cname(c)+(c.city?' ('+c.city+')':'')])];
+const statusOpts=()=>S.statuses.map(s=>[s.id,s.name]);
+const fdv=(fd,k)=>String(fd.get(k)??'').trim();
+
+/* ============ Customer dialog ============ */
+let dupConfirmed=null;
+function findDupes(v,selfId){
+ const p1=normPhone(v.phone),p2=normPhone(v.mobile),em=(v.email||'').toLowerCase();
+ return S.customers.filter(c=>c.id!==selfId&&(
+  (em&&(c.email||'').toLowerCase()===em)||
+  [p1,p2].some(p=>p.length>=6&&[normPhone(c.phone),normPhone(c.mobile)].includes(p))||
+  (v.lastName&&v.zip&&c.lastName&&c.lastName.toLowerCase()===v.lastName.toLowerCase()&&(c.firstName||'').toLowerCase()===(v.firstName||'').toLowerCase()&&c.zip===v.zip)));
+}
+function validateCust(v){
+ if(!v.firstName&&!v.lastName&&!v.company)return 'Bitte mindestens Name oder Firma angeben.';
+ if(v.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.email))return 'Die E-Mail-Adresse ist ungültig.';
+ for(const k of ['phone','mobile'])if(v[k]&&!/^[+\d][\d\s()\/.\-]{4,}$/.test(v[k]))return 'Die Telefonnummer ist ungültig (z. B. 0171 1234567 oder +49 171 1234567).';
+ if(v.zip&&!/^\d{5}$/.test(v.zip))return 'Die Postleitzahl muss fünfstellig sein.';
+ for(const k of ['roofArea','consumption','budget'])if(v[k]!==''&&(isNaN(num(v[k]))||num(v[k])<0))return 'Zahlenfelder müssen eine Zahl ≥ 0 enthalten.';
+ return '';
+}
+const CUST_KEYS=['firstName','lastName','company','type','street','zip','city','phone','mobile','email','prefContact','source','statusId','lostReason','buildingType','ownership','roofType','roofCondition','roofArea','consumption','hasPV','wantsStorage','wantsWallbox','wantsHeatpump','wantsEMS','scope','budget','timeframe','objectNotes','notes'];
+function customerDialog(id){
+ const c=id?cust(id):{statusId:'s1',type:'Privatkunde'};dupConfirmed=null;
+ const body=`<div class="fg">${F('firstName','Vorname',c.firstName)}${F('lastName','Nachname',c.lastName)}${F('company','Firma',c.company)}
+ ${F('type','Kundentyp',c.type,{t:'select',opts:['Privatkunde','Gewerbekunde']})}
+ ${F('phone','Telefon',c.phone,{t:'tel',inputmode:'tel'})}${F('mobile','Mobil',c.mobile,{t:'tel',inputmode:'tel'})}${F('email','E-Mail',c.email,{t:'email'})}
+ ${F('city','Ort',c.city)}${F('source','Quelle des Leads',c.source,{t:'select',opts:['',...SOURCES]})}${F('statusId','Vertriebsstatus',c.statusId,{t:'select',opts:statusOpts()})}</div>
+ <details><summary>Adresse &amp; Kontakt</summary><div class="fg" style="margin-top:8px">${F('street','Straße und Hausnummer',c.street)}${F('zip','PLZ',c.zip,{inputmode:'numeric'})}
+ ${F('prefContact','Bevorzugte Kontaktmethode',c.prefContact,{t:'select',opts:['','Anruf','E-Mail','WhatsApp','Persönlich']})}${F('lostReason','Verlustgrund (nur bei „verloren“)',c.lostReason,{t:'select',opts:['',...LOST]})}</div></details>
+ <details><summary>PV-Informationen</summary><div class="fg" style="margin-top:8px">
+ ${F('buildingType','Gebäudetyp',c.buildingType,{t:'select',opts:['','Einfamilienhaus','Mehrfamilienhaus','Gewerbe','Sonstiges']})}
+ ${F('ownership','Eigentümer / Mieter',c.ownership,{t:'select',opts:['','Eigentümer','Mieter']})}
+ ${F('roofType','Dachart',c.roofType,{t:'select',opts:['','Satteldach','Flachdach','Walmdach','Pultdach','Sonstiges']})}${F('roofCondition','Dachzustand',c.roofCondition)}
+ ${F('roofArea','Dachfläche (m²)',c.roofArea,{t:'number',step:'any',min:0})}${F('consumption','Stromverbrauch pro Jahr (kWh)',c.consumption,{t:'number',step:'any',min:0})}
+ ${F('hasPV','Vorhandene PV-Anlage',c.hasPV,{t:'select',opts:TRI})}${F('wantsStorage','Interesse Batteriespeicher',c.wantsStorage,{t:'select',opts:TRI})}
+ ${F('wantsWallbox','Interesse Wallbox',c.wantsWallbox,{t:'select',opts:TRI})}${F('wantsHeatpump','Interesse Wärmepumpe',c.wantsHeatpump,{t:'select',opts:TRI})}
+ ${F('wantsEMS','Interesse dyn. Stromtarif / Energiemanagement',c.wantsEMS,{t:'select',opts:TRI})}${F('scope','Gewünschter Projektumfang',c.scope)}
+ ${F('budget','Budget (€, ungefähr)',c.budget,{t:'number',step:'any',min:0})}${F('timeframe','Gewünschter Umsetzungszeitraum',c.timeframe)}
+ ${F('objectNotes','Sonstige Informationen zum Objekt',c.objectNotes,{t:'textarea',cls:'w2'})}</div></details>
+ <div class="fg">${F('notes','Wichtige Notizen',c.notes,{t:'textarea',cls:'w2'})}</div>`;
+ modal(id?'Kunde bearbeiten':'Neuer Kunde',body,async(fd,f,err)=>{
+  const v={};CUST_KEYS.forEach(k=>v[k]=fdv(fd,k));
+  const e=validateCust(v);if(e){err.textContent=e;return false}
+  const dup=findDupes(v,id);
+  if(dup.length&&dupConfirmed!==JSON.stringify(v)){dupConfirmed=JSON.stringify(v);err.innerHTML='<span class="warn">⚠ Mögliche Dublette: '+dup.map(d=>`<a href="#/customer/${d.id}">${esc(cname(d))}</a>`).join(', ')+'. Erneut auf „Speichern“ klicken, um trotzdem zu speichern.</span>';return false}
+  const old=id?{...c}:null,o=id?c:{};
+  Object.assign(o,v);['roofArea','consumption','budget'].forEach(k=>o[k]=num(v[k]));
+  const saved=await save('customers',o);
+  if(!old)await log(saved.id,'note','Kunde angelegt'+(st(saved.statusId).name?' – Status: '+st(saved.statusId).name:''));
+  else if(old.statusId!==saved.statusId)await log(saved.id,'status',`Status: ${st(old.statusId).name} → ${st(saved.statusId).name}`+(saved.lostReason&&st(saved.statusId).kind==='lost'?` (Grund: ${saved.lostReason})`:''));
+  toast(old?'Kunde gespeichert.':'Kunde angelegt.');if(!old)location.hash='#/customer/'+saved.id;else render();
+ });
+}
+async function setStatus(cid,newId,reason){
+ const c=cust(cid);if(!c||c.statusId===newId)return;const old=c.statusId;c.statusId=newId;
+ if(st(newId).kind==='lost'&&reason)c.lostReason=reason;
+ await save('customers',c);
+ await log(cid,'status',`Status: ${st(old).name} → ${st(newId).name}`+(st(newId).kind==='lost'&&reason?` (Grund: ${reason})`:''));
+ toast('Status geändert: '+st(newId).name);render();
+}
+function askStatus(cid,newId){
+ if(st(newId).kind!=='lost')return setStatus(cid,newId);
+ modal('Verlustgrund',`<p>Status „${esc(st(newId).name)}“ – optional einen Grund festhalten:</p>${F('r','Verlustgrund',cust(cid)?.lostReason||'',{t:'select',opts:['',...LOST]})}`,async fd=>{await setStatus(cid,newId,fdv(fd,'r'))},{ok:'Status ändern'});
+}
+
+/* ============ Task / callback dialogs ============ */
+function taskDialog(kind,id,customerId,defaults={}){
+ const t=id?S.tasks.find(x=>x.id===id):{kind,customerId:customerId||'',priority:'normal',contactType:'Anruf',date:addDays(today(),1),time:'',...defaults};
+ kind=t.kind;
+ const cb=kind==='callback';
+ const body=`<div class="fg">${F('customerId','Kunde',t.customerId,{t:'select',opts:custOpts(true),req:cb})}
+ ${cb?F('contactType','Art des Kontakts',t.contactType,{t:'select',opts:['Anruf','E-Mail','WhatsApp','Persönlicher Besuch','Sonstiges']})+F('reason','Grund des Kontakts',t.reason):F('title','Aufgabe',t.title,{req:true,ph:'z. B. Angebot vorbereiten'})}
+ ${F('date','Datum',t.date,{t:'date',req:true})}${F('time','Uhrzeit (optional)',t.time,{t:'time'})}
+ ${cb?F('window','oder Zeitfenster',t.window,{t:'select',opts:['','Vormittag','Nachmittag','Abend','Ganztägig']}):''}
+ ${F('priority','Priorität',t.priority,{t:'select',opts:Object.entries(PRIOL)})}
+ ${F('remDate','Erinnerung am (optional)',t.remDate,{t:'date'})}${F('remTime','Erinnerung um',t.remTime,{t:'time'})}
+ ${F('description','Beschreibung',t.description,{t:'textarea',cls:'w2'})}</div>
+ <div class="filters"><span class="muted sm">Schnellwahl:</span>${[[1,'Morgen'],[3,'+3 Tage'],[7,'+7 Tage'],[14,'+14 Tage']].map(p=>`<button type="button" class="btn sm" data-act="preset" data-days="${p[0]}">${p[1]}</button>`).join('')}</div>
+ <div class="hint">Ohne eigene Erinnerung wird zur Uhrzeit des Termins (abzüglich Vorlaufzeit aus den Einstellungen) bzw. bei reinem Datum zur Standardzeit erinnert.</div>`;
+ modal((id?'Bearbeiten: ':'')+(cb?'Rückruf / Wiedervorlage':'Aufgabe'),body,async fd=>{
+  const o=id?t:{status:'open',kind};
+  o.customerId=fdv(fd,'customerId');o.date=fdv(fd,'date');o.time=fdv(fd,'time');o.priority=fdv(fd,'priority')||'normal';o.description=fdv(fd,'description');
+  o.remDate=fdv(fd,'remDate');o.remTime=fdv(fd,'remTime');
+  if(cb){o.contactType=fdv(fd,'contactType');o.reason=fdv(fd,'reason');o.window=fdv(fd,'window')}else o.title=fdv(fd,'title');
+  if(!o.date)throw new Error('Bitte ein Datum angeben.');
+  if(o.remTime&&!o.remDate)throw new Error('Für die Erinnerungszeit bitte auch ein Erinnerungsdatum wählen.');
+  if(cb&&!o.customerId)throw new Error('Bitte einen Kunden wählen.');
+  const s=await save('tasks',o);
+  if(!id&&o.customerId)await log(o.customerId,'task',`${cb?'Wiedervorlage':'Aufgabe'} geplant: ${taskTitle(o)} am ${fDate(o.date)}${o.time?' um '+o.time+' Uhr':''}`);
+  toast(cb?'Rückruf geplant.':'Aufgabe gespeichert.');render();
+ });
+}
+function callDialog(cid,taskId){
+ const c=cust(cid),t=taskId?S.tasks.find(x=>x.id===taskId):null;
+ const body=`<p>${c?`<b>${esc(cname(c))}</b> ${c.phone?phoneLink(c.phone):''} ${c.mobile?phoneLink(c.mobile):''}`:''}${t?`<br><span class="muted">Aufgabe: ${esc(taskTitle(t))} (${fDate(t.date)} ${esc(t.time||'')})</span>`:''}</p>
+ <div class="fg">${F('result','Gesprächsergebnis',t?'':'',{t:'select',opts:CALL_RES,req:true})}${F('statusId','Vertriebsstatus ändern (optional)',cust(cid)?.statusId,{t:'select',opts:statusOpts()})}
+ ${F('text','Notiz zum Gespräch',''  ,{t:'textarea',cls:'w2',rows:3})}</div>
+ <label class="f chk"><input type="checkbox" name="next" checked><span>Nächsten Rückruf planen</span></label>
+ <div class="fg" style="margin-top:8px">${F('nDate','Datum',addDays(today(),1),{t:'date'})}${F('nTime','Uhrzeit','10:30',{t:'time'})}${F('nReason','Grund','Nachfassen')}${F('nPrio','Priorität','normal',{t:'select',opts:Object.entries(PRIOL)})}</div>
+ <div class="filters">${[[1,'Morgen'],[3,'+3 Tage'],[7,'+7 Tage'],[14,'+14 Tage']].map(p=>`<button type="button" class="btn sm" data-act="preset" data-days="${p[0]}" data-f="nDate">${p[1]}</button>`).join('')}</div>`;
+ const d=modal('Gespräch dokumentieren',body,async fd=>{
+  const res=fdv(fd,'result');
+  await log(cid,t?'callback_done':'call',(t?`Wiedervorlage erledigt: ${taskTitle(t)}. `:'')+fdv(fd,'text'),res);
+  if(t){t.status='done';t.doneAt=Date.now();t.result=res;await save('tasks',t)}
+  const newSt=fdv(fd,'statusId');if(newSt&&newSt!==cust(cid).statusId)await setStatus(cid,newSt);
+  if(fd.get('next')){if(!fdv(fd,'nDate'))throw new Error('Bitte Datum für den nächsten Rückruf wählen.');
+   const nt=await save('tasks',{kind:'callback',status:'open',customerId:cid,contactType:'Anruf',reason:fdv(fd,'nReason'),date:fdv(fd,'nDate'),time:fdv(fd,'nTime'),priority:fdv(fd,'nPrio'),description:''});
+   await log(cid,'task',`Wiedervorlage geplant: ${taskTitle(nt)} am ${fDate(nt.date)}${nt.time?' um '+nt.time+' Uhr':''}`)}
+  toast('Gespräch dokumentiert.');render();
+ },{ok:'Speichern'});
+ const sel=$('[name=result]',d),ss=$('[name=statusId]',d);
+ sel.addEventListener('change',()=>{const m=RES2STATUS[sel.value];if(m)ss.value=m});
+ const nx=$('[name=next]',d);nx.addEventListener('change',()=>{$$('[name^=n]:not([name=next])',d).forEach(i=>i.disabled=!nx.checked)});
+}
+const $$=(s,e=document)=>[...e.querySelectorAll(s)];
+
+/* ============ Appointment & project dialogs ============ */
+function apptDialog(id,customerId,date){
+ const a=id?S.appointments.find(x=>x.id===id):{customerId:customerId||'',date:date||addDays(today(),1),start:'10:00',end:'11:00',type:'Erstberatung',status:'geplant',remindMin:'60'};
+ const c=cust(a.customerId);
+ const body=`<div class="fg">${F('customerId','Kunde',a.customerId,{t:'select',opts:custOpts(true),req:true})}${F('type','Terminart',a.type,{t:'select',opts:APPT_T})}
+ ${F('date','Datum',a.date,{t:'date',req:true})}${F('start','Beginn',a.start,{t:'time',req:true})}${F('end','Ende',a.end,{t:'time',req:true})}
+ ${F('status','Status',a.status,{t:'select',opts:APPT_S})}${F('remindMin','Erinnerung',a.remindMin,{t:'select',opts:[['','keine'],['15','15 Min. vorher'],['30','30 Min. vorher'],['60','1 Std. vorher'],['120','2 Std. vorher'],['1440','1 Tag vorher']]})}
+ ${F('address','Adresse / Treffpunkt',a.address||(c?[c.street,[c.zip,c.city].filter(Boolean).join(' ')].filter(Boolean).join(', '):''),{cls:'w2'})}
+ ${F('prep','Notizen zur Vorbereitung',a.prep,{t:'textarea',cls:'w2'})}</div>`;
+ modal(id?'Termin bearbeiten':'Termin erstellen',body,async fd=>{
+  const o=id?a:{};['customerId','type','date','start','end','status','remindMin','address','prep'].forEach(k=>o[k]=fdv(fd,k));
+  if(!o.customerId)throw new Error('Bitte einen Kunden wählen.');
+  if(o.end<=o.start)throw new Error('Das Ende muss nach dem Beginn liegen.');
+  const old=id?{...a}:null;await save('appointments',o);
+  await log(o.customerId,'appointment',old?`Termin geändert: ${o.type} am ${fDate(o.date)} ${o.start}–${o.end} (${o.status})`:`Termin angelegt: ${o.type} am ${fDate(o.date)} ${o.start}–${o.end}`);
+  toast('Termin gespeichert.');render();
+ });
+}
+function projectDialog(id,customerId){
+ const p=id?S.projects.find(x=>x.id===id):{customerId,offerStatus:'Entwurf'};
+ modal(id?'Projekt bearbeiten':'Neues Projekt / Angebot',`<div class="fg">${F('name','Projektbezeichnung',p.name,{req:true,ph:'z. B. PV 9,8 kWp + Speicher'})}
+ ${F('value','Geschätzter Auftragswert (€)',p.value,{t:'number',step:'any',min:0})}${F('offerDate','Angebotsdatum',p.offerDate,{t:'date'})}${F('offerStatus','Angebotsstatus',p.offerStatus,{t:'select',opts:OFFER_S})}
+ ${F('kwp','Anlagengröße (kWp)',p.kwp,{t:'number',step:'any',min:0})}${F('kwh','Speicher (kWh)',p.kwh,{t:'number',step:'any',min:0})}
+ ${F('expectedClose','Erwarteter Abschluss',p.expectedClose,{t:'date'})}${F('actualClose','Tatsächlicher Abschluss',p.actualClose,{t:'date'})}
+ ${F('comment','Kommentar',p.comment,{t:'textarea',cls:'w2'})}</div>`,async fd=>{
+  const o=id?p:{customerId};const old=id?p.offerStatus:null;
+  o.name=fdv(fd,'name');o.offerStatus=fdv(fd,'offerStatus');['offerDate','expectedClose','actualClose','comment'].forEach(k=>o[k]=fdv(fd,k));
+  ['value','kwp','kwh'].forEach(k=>{const n=num(fdv(fd,k));if(n!=null&&(isNaN(n)||n<0))throw new Error('Zahlenfelder müssen eine Zahl ≥ 0 enthalten.');o[k]=n});
+  if(o.offerStatus==='Gewonnen'&&!o.actualClose)o.actualClose=today();
+  await save('projects',o);
+  if(old!==o.offerStatus)await log(o.customerId,'offer',`Projekt „${o.name}“: Angebotsstatus ${old?old+' → ':''}${o.offerStatus}${o.value?' (Schätzwert '+eur(o.value)+')':''}`);
+  toast('Projekt gespeichert.');render();
+ });
+}
+
+/* ============ Reminders ============ */
+function inQuiet(ts){const q=S.prefs;if(!q.quietOn)return false;const d=new Date(ts),m=d.getHours()*60+d.getMinutes();
+ const [fh,fm]=q.quietFrom.split(':').map(Number),[th,tm]=q.quietTo.split(':').map(Number),f=fh*60+fm,t=th*60+tm;
+ return f<=t?(m>=f&&m<t):(m>=f||m<t)}
+function reminderItems(){
+ const out=[],P=S.prefs;
+ for(const t of S.tasks){if(!isOpen(t))continue;const c=cust(t.customerId);
+  let at;if(t.remDate)at=new Date(t.remDate+'T'+(t.remTime||P.dayTime)).getTime();
+  else if(t.time)at=dueTs(t)-P.leadMin*60000;else at=new Date(t.date+'T'+P.dayTime).getTime();
+  const body=`${c?cname(c)+' · ':''}fällig ${fDate(t.date)}${t.time?' '+t.time+' Uhr':''}${t.description?' · '+t.description.slice(0,80):''}`;
+  const url=c?'#/customer/'+c.id+'/tasks':'#/tasks';
+  out.push({key:`t:${t.id}:${at}`,at,title:(t.kind==='callback'?'📞 ':'✅ ')+taskTitle(t),body,url});
+  if(P.overdueMin>0&&overdue(t)){const n=Math.floor((Date.now()-dueTs(t))/(P.overdueMin*60000));if(n>=1)out.push({key:`o:${t.id}:${dueTs(t)}:${n}`,at:Date.now(),title:'⚠ Überfällig: '+taskTitle(t),body,url})}}
+ for(const a of S.appointments){if(!['geplant','bestätigt'].includes(a.status)||a.remindMin==='')continue;const c=cust(a.customerId);
+  out.push({key:`a:${a.id}:${a.date}${a.start}:${a.remindMin}`,at:apptStart(a)-Number(a.remindMin)*60000,title:`📅 ${a.type} um ${a.start} Uhr`,body:`${c?cname(c):''}${a.address?' · '+a.address:''}`,url:c?'#/customer/'+c.id+'/appts':'#/appointments'})}
+ return out;
+}
+async function notify(it){
+ toast(`🔔 ${it.title} – ${it.body}`,'info',9000,it.url);
+ if('Notification'in window&&Notification.permission==='granted'){
+  try{const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();const o={body:it.body,tag:it.key,data:{url:it.url},icon:'icon-192.png'};
+   if(reg)await reg.showNotification(it.title,o);else new Notification(it.title,o)}catch(e){console.warn(e)}}
+}
+let checking=false;
+async function checkReminders(){
+ if(checking||!db)return;checking=true;
+ try{const now=Date.now();const items=reminderItems().filter(i=>i.at<=now&&!S.fired[i.key]);
+  if(items.length&&inQuiet(now)){return}
+  const fresh=items.filter(i=>now-i.at<24*36e5);let changed=false;
+  items.forEach(i=>{S.fired[i.key]=now;changed=true});
+  if(fresh.length>3){toast(`🔔 ${fresh.length} Erinnerungen fällig bzw. verpasst – siehe Rückrufe.`,'info',9000,'#/followups');
+   if(Notification.permission==='granted')notify({key:'sum:'+now,title:`${fresh.length} Erinnerungen fällig`,body:'Offene Rückrufe und Aufgaben ansehen',url:'#/followups'})}
+  else for(const i of fresh)await notify(i);
+  for(const k of Object.keys(S.fired))if(now-S.fired[k]>14*864e5){delete S.fired[k];changed=true}
+  if(changed)await setSet('fired',S.fired);
+ }finally{checking=false}
+}
+
+/* ============ Calendar export (.ics) – zuverlässige Erinnerung durch die Kalender-App ============ */
+const icsEsc=s=>String(s||'').replace(/\\/g,'\\\\').replace(/;/g,'\\;').replace(/,/g,'\\,').replace(/\r?\n/g,'\\n');
+const icsDT=(d,t)=>d.replace(/-/g,'')+'T'+(t||'09:00').replace(':','')+'00';
+function icsEvent(o){return ['BEGIN:VEVENT','UID:'+o.uid+'@pv-crm','DTSTAMP:'+new Date().toISOString().replace(/[-:]/g,'').slice(0,15)+'Z','DTSTART:'+o.s,'DTEND:'+o.e,'SUMMARY:'+icsEsc(o.sum),'DESCRIPTION:'+icsEsc(o.desc),o.loc?'LOCATION:'+icsEsc(o.loc):'','BEGIN:VALARM','ACTION:DISPLAY','DESCRIPTION:'+icsEsc(o.sum),'TRIGGER:-PT'+o.alarm+'M','END:VALARM','END:VEVENT'].filter(Boolean)}
+function taskIcs(t){const c=cust(t.customerId),t0=t.time||S.prefs.dayTime;const [h,m]=t0.split(':').map(Number);const e=pad(Math.floor((h*60+m+15)/60)%24)+':'+pad((h*60+m+15)%60);
+ return icsEvent({uid:t.id,s:icsDT(t.date,t0),e:icsDT(t.date,e),sum:(c?cname(c)+' – ':'')+taskTitle(t),desc:t.description,alarm:t.time?S.prefs.leadMin:0})}
+function apptIcs(a){const c=cust(a.customerId);return icsEvent({uid:a.id,s:icsDT(a.date,a.start),e:icsDT(a.date,a.end),sum:`${a.type}${c?' – '+cname(c):''}`,desc:a.prep,loc:a.address,alarm:Number(a.remindMin||15)})}
+function download(name,content,mime){const b=new Blob([content],{type:mime});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;document.body.append(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(a.href)},2000)}
+const icsFile=evs=>['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//PV-CRM//DE','CALSCALE:GREGORIAN',...evs.flat(),'END:VCALENDAR'].join('\r\n');
+
+/* ============ CSV ============ */
+const csvCell=v=>{let s=String(v??'');if(/^[=+\-@\t\r]/.test(s))s="'"+s;return /[;"\n\r]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
+const CSV_COLS=[['firstName','Vorname'],['lastName','Nachname'],['company','Firma'],['type','Kundentyp'],['street','Straße'],['zip','PLZ'],['city','Ort'],['phone','Telefon'],['mobile','Mobil'],['email','E-Mail'],['source','Quelle'],['statusId','Status'],['consumption','Stromverbrauch kWh'],['notes','Notizen']];
+function exportCSV(list){
+ const rows=[CSV_COLS.map(c=>c[1]),...list.map(c=>CSV_COLS.map(([k])=>k==='statusId'?st(c.statusId).name:c[k]))];
+ download('kunden-'+today()+'.csv','\uFEFF'+rows.map(r=>r.map(csvCell).join(';')).join('\r\n'),'text/csv;charset=utf-8');toast(list.length+' Kunden exportiert.');
+}
+function parseCSV(txt){txt=txt.replace(/^\uFEFF/,'');const first=txt.split(/\r?\n/)[0]||'';const dl=first.split(';').length>=first.split(',').length?';':',';
+ const rows=[];let row=[],cur='',q=false;
+ for(let i=0;i<txt.length;i++){const ch=txt[i];
+  if(q){if(ch==='"'){if(txt[i+1]==='"'){cur+='"';i++}else q=false}else cur+=ch}
+  else if(ch==='"')q=true;else if(ch===dl){row.push(cur);cur=''}
+  else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&txt[i+1]==='\n')i++;row.push(cur);cur='';rows.push(row);row=[]}else cur+=ch}
+ if(cur||row.length){row.push(cur);rows.push(row)}return rows.filter(r=>r.some(x=>x.trim()))}
+function importCSV(file){
+ const rd=new FileReader();rd.onload=()=>{
+  const rows=parseCSV(String(rd.result));if(rows.length<2){toast('Die Datei enthält keine Datenzeilen.','error');return}
+  const head=rows[0].map(h=>h.trim());const guess=(label,key)=>{const l=(label+' '+key).toLowerCase();const i=head.findIndex(h=>{h=h.toLowerCase();return h===label.toLowerCase()||h===key.toLowerCase()||(key==='phone'&&/^tel/.test(h))||(key==='zip'&&h==='plz')});return i};
+  const fields=CSV_COLS.filter(c=>c[0]!=='statusId').map(([k,l])=>`<label class="f"><span>${l}</span><select name="m_${k}"><option value="-1">– nicht importieren –</option>${head.map((h,i)=>`<option value="${i}"${guess(l,k)===i?' selected':''}>${esc(h)}</option>`).join('')}</select></label>`).join('');
+  modal(`CSV-Import (${rows.length-1} Zeilen)`,`<p class="muted">Spalten zuordnen. Neue Kunden erhalten den Status „${esc(st('s1').name)}“. Dubletten (gleiche Telefonnummer/E-Mail) werden übersprungen.</p><div class="fg">${fields}</div>`,async fd=>{
+   let ok=0,dup=0,bad=0;const seen=[];
+   for(const r of rows.slice(1)){const v={};CSV_COLS.forEach(([k])=>{if(k==='statusId')return;const i=Number(fd.get('m_'+k));v[k]=i>=0?String(r[i]??'').trim():''});
+    if(!v.type)v.type='Privatkunde';if(validateCust(v)){bad++;continue}
+    if(findDupes(v).length||seen.some(s=>(v.email&&s.email===v.email)||(normPhone(v.phone).length>=6&&normPhone(s.phone)===normPhone(v.phone)))){dup++;continue}
+    seen.push(v);const o={...v,statusId:'s1',consumption:num(v.consumption)};const s=await save('customers',o);await log(s.id,'note','Per CSV-Import angelegt');ok++}
+   toast(`Import: ${ok} neu, ${dup} Dubletten übersprungen, ${bad} ungültig.`,ok?'ok':'info',8000);render();
+  },{ok:'Importieren'});
+ };rd.readAsText(file,'utf-8');
+}
+
+/* ============ Backup (JSON) ============ */
+function backupData(){return {app:'pv-crm',version:1,exportedAt:new Date().toISOString(),data:{customers:S.customers,projects:S.projects,tasks:S.tasks,appointments:S.appointments,activities:S.activities,statuses:S.statuses,tomb:S.tomb}}}
+async function backupExport(){download(`pv-crm-backup-${today()}.json`,JSON.stringify(backupData(),null,1),'application/json');S.meta.lastBackup=Date.now();await setSet('meta',S.meta);toast('Backup-Datei erstellt. Bitte sicher aufbewahren (enthält Kundendaten!).');render()}
+async function backupImport(file){
+ try{const j=JSON.parse(await file.text());if(j.app!=='pv-crm'||!j.data)throw new Error('Keine gültige PV-CRM-Sicherung.');
+  let added=0,upd=0,del=0;const D=j.data;
+  for(const sname of ['customers','projects','tasks','appointments','activities']){const cur=new Map(S[sname].map(x=>[x.id,x]));
+   for(const r of D[sname]||[]){const e=cur.get(r.id);if(!e){await dbPut(sname,r);added++}else if((r.updatedAt||0)>(e.updatedAt||0)){await dbPut(sname,r);upd++}}}
+  const tomb=[...S.tomb];for(const t of D.tomb||[])if(!tomb.some(x=>x.id===t.id&&x.store===t.store))tomb.push(t);
+  await setSet('tomb',tomb);await load();
+  for(const t of S.tomb){const e=(S[t.store]||[]).find(x=>x.id===t.id);if(e&&(e.updatedAt||0)<t.at){await dbDel(t.store,t.id);del++}}
+  const have=new Set(S.statuses.map(s=>s.id));const ns=(D.statuses||[]).filter(s=>!have.has(s.id));if(ns.length)await setSet('statuses',[...S.statuses,...ns]);
+  await load();toast(`Import fertig: ${added} neu, ${upd} aktualisiert, ${del} gelöscht.`,'ok',8000);render();
+ }catch(e){toast('Import fehlgeschlagen: '+e.message,'error',8000)}
+}
+
+/* ============ Pages ============ */
+const UI={cust:{q:'',status:'',source:'',prio:'',due:'',sort:'name',fav:false,arch:false,sel:new Set()},cal:{mode:'week',date:today()},tasksTab:'open',fuTab:'all'};
+function taskRow(t){
+ const c=cust(t.customerId),od=overdue(t);
+ return `<div class="row ${od?'od':''} ${t.status==='done'?'done':''}"><div class="rmain"><div>${t.kind==='callback'?'📞':'✅'} <b>${esc(taskTitle(t))}</b> ${prioB(t.priority)}</div>
+ <div class="rs">${c?`<a href="#/customer/${c.id}">${esc(cname(c))}</a> · `:''}${fDate(t.date)} ${esc(t.time||t.window||'')}${od?' · <b class="red">überfällig</b>':''}${t.result?' · Ergebnis: '+esc(t.result):''}${t.description?' · '+esc(t.description):''}</div></div>
+ <div class="racts">${isOpen(t)?`<button class="btn sm ok" data-act="doneTask" data-id="${t.id}">✓ Erledigt</button>`:`<span class="muted sm">erledigt ${fTs(t.doneAt)}</span>`}
+ ${c&&c.phone&&isOpen(t)?`<a class="btn sm" href="tel:${esc(tel(c.phone))}">📞 Anrufen</a>`:''}
+ ${isOpen(t)?`<button class="btn sm" data-act="editTask" data-id="${t.id}">✎</button><button class="btn sm" data-act="icsTask" data-id="${t.id}" title="In Kalender-App übernehmen">📅</button>`:''}
+ <button class="btn sm dan" data-act="delTask" data-id="${t.id}">🗑</button></div></div>`;
+}
+function apptRow(a,showCust=true){
+ const c=cust(a.customerId);
+ return `<div class="row"><div class="rmain"><b>${fDate(a.date)} ${esc(a.start)}–${esc(a.end)}</b> · ${esc(a.type)} <span class="badge" style="--c:${APPT_C[a.status]}">${a.status}</span>
+ <div class="rs">${showCust&&c?`<a href="#/customer/${c.id}">${esc(cname(c))}</a> · `:''}${esc(a.address||'')}${a.prep?' · '+esc(a.prep):''}</div></div>
+ <div class="racts"><button class="btn sm" data-act="editAppt" data-id="${a.id}">✎</button><button class="btn sm" data-act="icsAppt" data-id="${a.id}" title="In Kalender-App übernehmen">📅</button><button class="btn sm dan" data-act="delAppt" data-id="${a.id}">🗑</button></div></div>`;
+}
+const empty=t=>`<div class="empty">${t}</div>`;
+
+function pDashboard(){
+ const cs=S.customers.filter(c=>!c.archived),T=today(),open=S.tasks.filter(isOpen),cb=open.filter(t=>t.kind==='callback');
+ const od=cb.filter(overdue),td=cb.filter(t=>t.date===T&&!overdue(t)),k=c=>st(c.statusId).kind;
+ const nOpen=cs.filter(c=>k(c)==='open').length,won=cs.filter(c=>k(c)==='won').length,lost=cs.filter(c=>k(c)==='lost').length;
+ const waiting=cs.filter(c=>lastResult(c.id)==='Rückmeldung steht aus'||c.statusId==='s10');
+ const apps=S.appointments.filter(a=>activeAppt(a)&&a.date>=T&&a.date<=addDays(T,7)).sort((a,b)=>apptStart(a)-apptStart(b));
+ const todayAp=apps.filter(a=>a.date===T);
+ const prj=S.projects.filter(p=>cust(p.customerId)&&!cust(p.customerId).archived),openP=prj.filter(p=>!['Gewonnen','Verloren'].includes(p.offerStatus)),wonP=prj.filter(p=>p.offerStatus==='Gewonnen');
+ const sumO=openP.reduce((s,p)=>s+(p.value||0),0),sumW=wonP.reduce((s,p)=>s+(p.value||0),0);
+ const tasksOd=open.filter(t=>t.kind==='task'&&overdue(t)),tasksTd=open.filter(t=>t.kind==='task'&&t.date===T&&!overdue(t));
+ const nextTasks=open.filter(t=>t.kind==='task').sort((a,b)=>dueTs(a)-dueTs(b)).slice(0,5);
+ const byStatus=S.statuses.map(s=>({s,n:cs.filter(c=>c.statusId===s.id).length})).filter(x=>x.n),mx=Math.max(1,...byStatus.map(x=>x.n));
+ const srcs=[...new Set(cs.map(c=>c.source||'unbekannt'))].map(s=>({s,n:cs.filter(c=>(c.source||'unbekannt')===s).length})).sort((a,b)=>b.n-a.n),mx2=Math.max(1,...srcs.map(x=>x.n));
+ const focus=[...od,...td,...tasksOd,...tasksTd].sort((a,b)=>dueTs(a)-dueTs(b));
+ const noBackup=cs.length&&(!S.meta.lastBackup||Date.now()-S.meta.lastBackup>7*864e5);
+ return `${noBackup?`<div class="hint">⚠ ${S.meta.lastBackup?'Das letzte Backup ist älter als 7 Tage.':'Es wurde noch kein Backup erstellt.'} Die Daten liegen nur auf diesem Gerät. <a href="#/settings">Jetzt sichern →</a></div>`:''}
+ <div class="grid kpis" style="margin-bottom:16px">
+ <a class="kpi" href="#/customers"><b>${cs.length}</b><span>Kunden &amp; Interessenten</span></a>
+ <a class="kpi" href="#/customers" data-q="lead"><b>${cs.filter(c=>c.statusId==='s1').length}</b><span>Neue Leads</span></a>
+ <a class="kpi" href="#/pipeline"><b>${nOpen}</b><span>Offene Verkaufschancen</span></a>
+ <a class="kpi" href="#/followups"><b>${td.length}</b><span>Heute nachfassen</span></a>
+ <a class="kpi ${od.length?'red':''}" href="#/followups"><b>${od.length}</b><span>Überfällige Rückrufe</span></a>
+ <a class="kpi" href="#/appointments"><b>${apps.length}</b><span>Termine (7 Tage)${todayAp.length?` · ${todayAp.length} heute`:''}</span></a>
+ <div class="kpi"><b>${won}</b><span>Abgeschlossene Verkäufe</span></div>
+ <div class="kpi"><b>${lost}</b><span>Verlorene Chancen</span></div>
+ <div class="kpi"><b>${waiting.length}</b><span>Warte auf Rückmeldung</span></div>
+ <div class="kpi est"><b>${eur(sumO)}</b><span>Offene Chancen · <i>Schätzwert</i> (${openP.length} Projekte)</span></div>
+ <div class="kpi"><b>${eur(sumW)}</b><span>Gewonnene Aufträge (${wonP.length}, laut Erfassung)</span></div></div>
+ <div class="card"><h2>🎯 Heute im Fokus</h2>${focus.length||todayAp.length?focus.map(taskRow).join('')+todayAp.map(a=>apptRow(a)).join(''):empty('Nichts Fälliges – alles erledigt. 🎉')}</div>
+ <div class="grid two"><div class="card"><h2>Nächste Termine</h2>${apps.length?apps.slice(0,6).map(a=>apptRow(a)).join(''):empty('Keine Termine in den nächsten 7 Tagen.')}</div>
+ <div class="card"><h2>Nächste Aufgaben</h2>${nextTasks.length?nextTasks.map(taskRow).join(''):empty('Keine offenen Aufgaben.')}</div></div>
+ <div class="card"><h2>Warte auf Rückmeldung</h2>${waiting.length?waiting.map(c=>`<div class="row"><a href="#/customer/${c.id}"><b>${esc(cname(c))}</b></a>${badge(c.statusId)}<span class="rs">${esc(c.city||'')}</span></div>`).join(''):empty('Niemand.')}</div>
+ <div class="grid two"><div class="card"><h2>Kunden je Status</h2>${byStatus.length?byStatus.map(x=>`<div class="bar"><span class="l">${esc(x.s.name)}</span><i style="--c:${esc(x.s.color)};width:${x.n/mx*60}%"></i><b>${x.n}</b></div>`).join(''):empty('Noch keine Kunden.')}</div>
+ <div class="card"><h2>Leads je Quelle</h2>${srcs.length?srcs.map(x=>`<div class="bar"><span class="l">${esc(x.s)}</span><i style="width:${x.n/mx2*60}%"></i><b>${x.n}</b></div>`).join(''):empty('Noch keine Kunden.')}</div></div>
+ ${!S.customers.length?`<div class="card"><h2>Los geht’s</h2><p>Lege deinen ersten Interessenten an oder lade Demodaten zum Ausprobieren (in den Einstellungen jederzeit wieder entfernbar).</p><button class="btn pri" data-act="newCustomer">＋ Neuer Kunde</button> <button class="btn" data-act="demoLoad">Demodaten laden</button></div>`:''}`;
+}
+function filteredCustomers(){
+ const U=UI.cust,D=derive(),q=U.q.toLowerCase().trim(),qd=normPhone(U.q),T=today(),wk=addDays(T,7);
+ let l=S.customers.filter(c=>!!c.archived===U.arch);
+ if(U.fav)l=l.filter(c=>c.favorite);
+ if(q)l=l.filter(c=>[c.firstName,c.lastName,c.company,c.email,c.city,c.phone,c.mobile].join(' ').toLowerCase().includes(q)||(qd.length>=3&&[normPhone(c.phone),normPhone(c.mobile)].some(p=>p.includes(qd))));
+ if(U.status)l=l.filter(c=>c.statusId===U.status);if(U.source)l=l.filter(c=>(c.source||'')===U.source);
+ if(U.prio)l=l.filter(c=>D[c.id].prio===PRIO[U.prio]);
+ if(U.due==='overdue')l=l.filter(c=>D[c.id].od);
+ if(U.due==='today')l=l.filter(c=>D[c.id].nextCb&&D[c.id].nextCb.date===T);
+ if(U.due==='week')l=l.filter(c=>D[c.id].nextCb&&D[c.id].nextCb.date<=wk);
+ if(U.due==='none')l=l.filter(c=>!D[c.id].nextCb);
+ const so={name:(a,b)=>cname(a).localeCompare(cname(b),'de'),activity:(a,b)=>D[b.id].lastAny-D[a.id].lastAny,created:(a,b)=>(b.createdAt||0)-(a.createdAt||0),
+  status:(a,b)=>S.statuses.findIndex(s=>s.id===a.statusId)-S.statuses.findIndex(s=>s.id===b.statusId),
+  next:(a,b)=>(D[a.id].nextCb?dueTs(D[a.id].nextCb):9e15)-(D[b.id].nextCb?dueTs(D[b.id].nextCb):9e15)};
+ return l.sort(so[U.sort]||so.name).map(c=>({c,d:D[c.id]}));
+}
+function custTable(){
+ const l=filteredCustomers(),U=UI.cust;
+ if(!l.length)return empty(S.customers.length?'Keine Treffer für diese Filter.':'Noch keine Kunden angelegt.');
+ return `<div class="tw"><table><thead><tr><th><input type="checkbox" data-change="selAll" ${l.every(x=>U.sel.has(x.c.id))?'checked':''}></th><th>Name</th><th>Telefon</th><th class="hm">Ort</th><th>Status</th><th class="hm">Letzter Kontakt</th><th>Nächste Wiedervorlage</th><th class="hm">Nächster Termin</th><th class="hm">Prio</th><th></th></tr></thead><tbody>
+ ${l.map(({c,d})=>`<tr><td><input type="checkbox" data-change="sel" data-id="${c.id}" ${U.sel.has(c.id)?'checked':''}></td>
+ <td><button class="btn sm" style="border:0;padding:0 4px;min-height:0" data-act="favCustomer" data-id="${c.id}" title="Favorit">${c.favorite?'⭐':'☆'}</button><a href="#/customer/${c.id}"><b>${esc(cname(c))}</b></a>${c.demo?' <span class="demo">DEMO</span>':''}${c.company&&(c.firstName||c.lastName)?`<div class="rs">${esc(c.company)}</div>`:''}</td>
+ <td>${phoneLink(c.phone||c.mobile)}</td><td class="hm">${esc(c.city||'')}</td><td>${badge(c.statusId)}</td><td class="hm">${d.last?fTs(d.last):'–'}</td>
+ <td>${d.nextCb?`<span class="${overdue(d.nextCb)?'red':''}">${fDate(d.nextCb.date)} ${esc(d.nextCb.time||'')}</span>`:'<span class="muted">–</span>'}</td>
+ <td class="hm">${d.nextAppt?fDate(d.nextAppt.date)+' '+d.nextAppt.start:'–'}</td><td class="hm">${d.prio?prioB(Object.keys(PRIO).find(k=>PRIO[k]===d.prio))||'normal':'–'}</td>
+ <td><button class="btn sm" data-act="editCustomer" data-id="${c.id}">✎</button></td></tr>`).join('')}</tbody></table></div><div class="muted sm" style="margin-top:6px">${l.length} Kunden</div>`;
+}
+function pCustomers(){
+ const U=UI.cust,views=S.prefs.views||[];
+ const sel=(k,opts,ph)=>`<select data-change="f_${k}"><option value="">${ph}</option>${opts.map(o=>{const[v,l]=Array.isArray(o)?o:[o,o];return `<option value="${esc(v)}"${U[k]===v?' selected':''}>${esc(l)}</option>`}).join('')}</select>`;
+ return `<div class="card"><div class="filters"><input type="search" placeholder="🔍 Suche: Name, Telefon, E-Mail, Ort" value="${esc(U.q)}" data-input="q" style="min-width:230px;flex:1">
+ ${sel('status',statusOpts(),'Alle Status')}${sel('source',SOURCES,'Alle Quellen')}${sel('prio',Object.entries(PRIOL),'Alle Prioritäten')}
+ ${sel('due',[['overdue','Überfällig'],['today','Heute fällig'],['week','Diese Woche'],['none','Ohne Wiedervorlage']],'Wiedervorlage: alle')}
+ <select data-change="f_sort">${[['name','Sortierung: Name'],['activity','Letzte Aktivität'],['next','Nächste Wiedervorlage'],['status','Status'],['created','Neueste zuerst']].map(([v,l])=>`<option value="${v}"${U.sort===v?' selected':''}>${l}</option>`).join('')}</select>
+ <label class="sm"><input type="checkbox" data-change="f_fav" ${U.fav?'checked':''}> ⭐</label><label class="sm"><input type="checkbox" data-change="f_arch" ${U.arch?'checked':''}> Archiv</label></div>
+ <div class="filters"><select data-change="applyView"><option value="">📁 Gespeicherte Ansichten</option>${views.map((v,i)=>`<option value="${i}">${esc(v.name)}</option>`).join('')}</select>
+ <button class="btn sm" data-act="saveView">Ansicht speichern</button>${views.length?'<button class="btn sm dan" data-act="delViews">Ansichten löschen</button>':''}
+ <button class="btn sm" data-act="resetFilters">Filter zurücksetzen</button><span style="flex:1"></span>
+ <button class="btn sm" data-act="exportCSV">⬇ CSV-Export</button><label class="btn sm" style="margin:0">⬆ CSV-Import<input type="file" accept=".csv,text/csv" data-change="csvFile" hidden></label></div>
+ <div id="bulk">${bulkBar()}</div><div id="custTable">${custTable()}</div></div>`;
+}
+const bulkBar=()=>UI.cust.sel.size?`<div class="filters hint"><b>${UI.cust.sel.size} markiert</b><select data-change="bulkStatus"><option value="">Status setzen …</option>${statusOpts().map(([v,l])=>`<option value="${v}">${esc(l)}</option>`).join('')}</select><button class="btn sm" data-act="bulkArch">Archivieren</button><button class="btn sm" data-act="bulkExport">CSV (Auswahl)</button><button class="btn sm" data-act="bulkClear">Auswahl aufheben</button></div>`:'';
+
+function pCustomer(id,tab){
+ const c=cust(id);if(!c)return empty('Kunde nicht gefunden. <a href="#/customers">Zur Liste</a>');
+ tab=tab||'info';const tabs=[['info','Stammdaten'],['acts','Aktivitäten'],['tasks','Aufgaben'],['appts','Termine'],['projects','Projekte']];
+ const tasks=S.tasks.filter(t=>t.customerId===id).sort((a,b)=>(isOpen(b)-isOpen(a))||dueTs(a)-dueTs(b)),appts=S.appointments.filter(a=>a.customerId===id).sort((a,b)=>apptStart(b)-apptStart(a)),prj=S.projects.filter(p=>p.customerId===id);
+ const yn=v=>v==='ja'?'Ja':v==='nein'?'Nein':'–';const row=(l,v)=>`<div><span>${l}</span>${v?esc(v):'–'}</div>`;
+ let body='';
+ if(tab==='info')body=`<div class="card"><h3>Persönliche Daten</h3><div class="dl">${row('Kundentyp',c.type)}${row('Firma',c.company)}${row('Adresse',[c.street,[c.zip,c.city].filter(Boolean).join(' ')].filter(Boolean).join(', '))}
+ <div><span>Telefon</span>${phoneLink(c.phone)||'–'}</div><div><span>Mobil</span>${phoneLink(c.mobile)||'–'}</div><div><span>E-Mail</span>${c.email?`<a href="mailto:${esc(c.email)}">${esc(c.email)}</a>`:'–'}</div>${row('Bevorzugter Kontakt',c.prefContact)}${row('Lead-Quelle',c.source)}${c.lostReason?row('Verlustgrund',c.lostReason):''}</div></div>
+ <div class="card"><h3>PV-Informationen</h3><div class="dl">${row('Gebäudetyp',c.buildingType)}${row('Eigentümer/Mieter',c.ownership)}${row('Dachart',c.roofType)}${row('Dachzustand',c.roofCondition)}${row('Dachfläche',c.roofArea!=null?c.roofArea+' m²':'')}${row('Stromverbrauch',c.consumption!=null?c.consumption.toLocaleString('de-DE')+' kWh/Jahr':'')}
+ ${row('Vorhandene PV',yn(c.hasPV))}${row('Batteriespeicher',yn(c.wantsStorage))}${row('Wallbox',yn(c.wantsWallbox))}${row('Wärmepumpe',yn(c.wantsHeatpump))}${row('Energiemanagement/dyn. Tarif',yn(c.wantsEMS))}${row('Projektumfang',c.scope)}${row('Budget',c.budget!=null?eur(c.budget):'')}${row('Zeitraum',c.timeframe)}${row('Objekt-Infos',c.objectNotes)}</div></div>
+ <div class="card"><h3>Wichtige Notizen</h3><textarea data-change="notes" data-id="${c.id}" rows="4" placeholder="Wird beim Verlassen des Feldes gespeichert">${esc(c.notes)}</textarea></div>`;
+ if(tab==='acts'){const acts=S.activities.filter(a=>a.customerId===id).sort((a,b)=>b.at-a.at);const ic={call:'📞',callback_done:'✅',email:'✉️',note:'📝',status:'🔄',appointment:'📅',task:'🗓',offer:'💶'};
+  body=`<div class="card"><h3>Notiz / Gespräch hinzufügen</h3><div class="filters"><select id="nType"><option value="note">Notiz</option><option value="call">Telefonat</option><option value="email">E-Mail (manuell dokumentiert)</option><option value="offer">Angebot versendet</option></select><select id="nRes"><option value="">Ergebnis (optional)</option>${CALL_RES.map(r=>`<option>${r}</option>`).join('')}</select></div><textarea id="nText" rows="3" placeholder="Was wurde besprochen?"></textarea><div class="acts"><button class="btn pri" data-act="addNote" data-id="${c.id}">Hinzufügen</button></div></div>
+  <div class="card"><h3>Verlauf</h3><div class="tl">${acts.length?acts.map(a=>`<div class="it"><b>${ic[a.type]||'•'} ${fTs(a.at)}</b>${a.result?` <span class="tag">${esc(a.result)}</span>`:''}<div>${esc(a.text)}</div>${['note','call','email'].includes(a.type)?`<button class="btn sm dan" data-act="delNote" data-id="${a.id}" style="margin-top:4px">Eintrag löschen</button>`:''}</div>`).join(''):empty('Noch keine Aktivitäten.')}</div></div>`}
+ if(tab==='tasks')body=`<div class="card"><div class="filters"><button class="btn pri" data-act="planCb" data-cid="${c.id}">📞 Rückruf planen</button><button class="btn" data-act="newTask" data-cid="${c.id}">＋ Aufgabe</button></div>${tasks.length?tasks.map(taskRow).join(''):empty('Keine Aufgaben oder Wiedervorlagen.')}</div>`;
+ if(tab==='appts')body=`<div class="card"><button class="btn pri" data-act="newAppt" data-cid="${c.id}">📅 Termin erstellen</button>${appts.length?appts.map(a=>apptRow(a,false)).join(''):empty('Keine Termine.')}</div>`;
+ if(tab==='projects')body=`<div class="card"><button class="btn pri" data-act="newProject" data-cid="${c.id}">＋ Projekt / Angebot</button>${prj.length?prj.map(p=>`<div class="row"><div class="rmain"><b>${esc(p.name)}</b> <span class="badge" style="--c:${p.offerStatus==='Gewonnen'?'#16a34a':p.offerStatus==='Verloren'?'#dc2626':'#2b6cb0'}">${p.offerStatus}</span>
+  <div class="rs">${p.value!=null?eur(p.value)+(p.offerStatus==='Gewonnen'?'':' (Schätzwert)'):''} ${p.kwp?'· '+p.kwp+' kWp':''} ${p.kwh?'· '+p.kwh+' kWh':''} ${p.offerDate?'· Angebot '+fDate(p.offerDate):''} ${p.expectedClose?'· erw. Abschluss '+fDate(p.expectedClose):''} ${p.actualClose?'· Abschluss '+fDate(p.actualClose):''}${p.comment?'<br>'+esc(p.comment):''}</div></div>
+  <div class="racts"><button class="btn sm" data-act="editProject" data-id="${p.id}">✎</button><button class="btn sm dan" data-act="delProject" data-id="${p.id}">🗑</button></div></div>`).join(''):empty('Noch keine Projekte.')}</div>`;
+ return `<div class="card"><div class="filters"><div style="flex:1;min-width:220px"><div style="font-size:20px;font-weight:700">${c.favorite?'⭐ ':''}${esc(cname(c))} ${c.demo?'<span class="demo">DEMO</span>':''}${c.archived?' <span class="tag">archiviert</span>':''}</div>
+ <div class="rs">${esc([c.company&&(c.firstName||c.lastName)?c.company:'',c.city].filter(Boolean).join(' · '))}</div></div>
+ <select data-change="custStatus" data-id="${c.id}" style="min-width:200px">${statusOpts().map(([v,l])=>`<option value="${v}"${v===c.statusId?' selected':''}>${esc(l)}</option>`).join('')}</select></div>
+ <div class="filters">${c.phone||c.mobile?`<a class="btn navy" href="tel:${esc(tel(c.phone||c.mobile))}">📞 Anrufen</a>`:''}<button class="btn pri" data-act="logCall" data-cid="${c.id}">📝 Gespräch dokumentieren</button><button class="btn" data-act="planCb" data-cid="${c.id}">⏰ Rückruf planen</button><button class="btn" data-act="newAppt" data-cid="${c.id}">📅 Termin</button>
+ <button class="btn" data-act="editCustomer" data-id="${c.id}">✎ Bearbeiten</button><button class="btn" data-act="favCustomer" data-id="${c.id}">${c.favorite?'★ Favorit entfernen':'☆ Favorit'}</button>
+ <button class="btn" data-act="archCustomer" data-id="${c.id}">${c.archived?'Wiederherstellen':'🗄 Archivieren'}</button><button class="btn" data-act="exportOne" data-id="${c.id}">⬇ Daten exportieren</button><button class="btn dan" data-act="delCustomer" data-id="${c.id}">🗑 Löschen</button></div></div>
+ <div class="tabs">${tabs.map(([k,l])=>`<a href="#/customer/${id}/${k}" class="${k===tab?'on':''}">${l}</a>`).join('')}</div>${body}`;
+}
+function pFollowups(){
+ const cb=S.tasks.filter(t=>isOpen(t)&&t.kind==='callback').sort((a,b)=>dueTs(a)-dueTs(b)),T=today();
+ const od=cb.filter(overdue),td=cb.filter(t=>t.date===T&&!overdue(t)),up=cb.filter(t=>t.date>T);
+ const sec=(h,l,c)=>`<div class="card"><h2 class="${c||''}">${h} (${l.length})</h2>${l.length?l.map(taskRow).join(''):empty('Nichts offen.')}</div>`;
+ return `<div class="filters"><button class="btn pri" data-act="planCb">＋ Rückruf planen</button><button class="btn" data-act="icsAll">📅 Alle offenen in Kalender-App übernehmen (.ics)</button></div>${sec('⚠ Überfällig',od,'red')}${sec('📞 Heute fällig',td)}${sec('🔜 Demnächst',up)}`;
+}
+function pTasks(){
+ const all=S.tasks.filter(t=>t.kind==='task'),T=today();const tb=UI.tasksTab;
+ const f={open:t=>isOpen(t),today:t=>isOpen(t)&&t.date===T&&!overdue(t),od:t=>overdue(t),done:t=>t.status==='done'};
+ const l=all.filter(f[tb]).sort((a,b)=>tb==='done'?b.doneAt-a.doneAt:dueTs(a)-dueTs(b));
+ return `<div class="filters"><button class="btn pri" data-act="newTask">＋ Aufgabe</button></div><div class="tabs">${[['open','Offen'],['today','Heute fällig'],['od','Überfällig'],['done','Erledigt']].map(([k,n])=>`<a href="javascript:void 0" data-act="tasksTab" data-k="${k}" class="${tb===k?'on':''}">${n} (${all.filter(f[k]).length})</a>`).join('')}</div>
+ <div class="card">${l.length?l.map(taskRow).join(''):empty('Keine Aufgaben in dieser Kategorie.')}</div>`;
+}
+function pPipeline(){
+ const D=S.customers.filter(c=>!c.archived);
+ return `<p class="muted">Karten auf eine andere Spalte ziehen – oder auf dem Handy das Auswahlfeld in der Karte nutzen.</p><div class="kan">${S.statuses.map(s=>{const l=D.filter(c=>c.statusId===s.id);
+ return `<div class="col" data-drop="${s.id}"><h4><span><span class="badge" style="--c:${esc(s.color)}">${esc(s.name)}</span></span><span class="muted">${l.length}</span></h4>
+ ${l.map(c=>`<div class="kc" draggable="true" data-drag="${c.id}"><a href="#/customer/${c.id}"><b>${esc(cname(c))}</b></a><div class="rs">${esc(c.city||'')} ${c.consumption?'· '+c.consumption.toLocaleString('de-DE')+' kWh':''}</div>
+ <select data-change="custStatus" data-id="${c.id}">${statusOpts().map(([v,n])=>`<option value="${v}"${v===c.statusId?' selected':''}>${esc(n)}</option>`).join('')}</select></div>`).join('')}</div>`}).join('')}</div>`;
+}
+function pAppointments(){
+ const C=UI.cal,d=C.date,T=today(),dt=new Date(d+'T12:00');
+ const on=ds=>S.appointments.filter(a=>a.date===ds&&a.status!=='abgesagt').sort((a,b)=>a.start.localeCompare(b.start));
+ const chip=a=>`<a class="chip" style="--c:${APPT_C[a.status]}" data-act="editAppt" data-id="${a.id}">${esc(a.start)} ${esc(cname(cust(a.customerId)))} · ${esc(a.type)}</a>`;
+ const WD=['Mo','Di','Mi','Do','Fr','Sa','So'];let title,nav,body;
+ if(C.mode==='day'){title=dt.toLocaleDateString('de-DE',{weekday:'long',day:'2-digit',month:'long',year:'numeric'});body=`<div class="card">${on(d).length?on(d).map(a=>apptRow(a)).join(''):empty('Keine Termine an diesem Tag.')}</div>`}
+ else if(C.mode==='week'){const wd=(dt.getDay()+6)%7,mon=addDays(d,-wd);title=`KW: ${fDate(mon)} – ${fDate(addDays(mon,6))}`;
+  body=`<div class="cal7">${WD.map((w,i)=>{const ds=addDays(mon,i);return `<div class="d ${ds===T?'today':''}"><b data-act="calDay" data-d="${ds}" style="cursor:pointer">${w} ${ds.slice(8)}.${ds.slice(5,7)}.</b>${on(ds).map(chip).join('')}</div>`}).join('')}</div>`}
+ else{title=dt.toLocaleDateString('de-DE',{month:'long',year:'numeric'});const first=d.slice(0,8)+'01',off=(new Date(first+'T12:00').getDay()+6)%7,start=addDays(first,-off);
+  body=`<div class="cal7">${WD.map(w=>`<div class="hd">${w}</div>`).join('')}${Array.from({length:42},(_,i)=>{const ds=addDays(start,i);if(i>=35&&ds.slice(0,7)!==d.slice(0,7))return '';const a=on(ds);return `<div class="d ${ds===T?'today':''} ${ds.slice(0,7)!==d.slice(0,7)?'dim':''}"><b data-act="calDay" data-d="${ds}" style="cursor:pointer">${+ds.slice(8)}.</b>${a.slice(0,3).map(chip).join('')}${a.length>3?`<div class="muted">+${a.length-3} weitere</div>`:''}</div>`}).join('')}</div>`}
+ return `<div class="filters"><button class="btn pri" data-act="newAppt" data-d="${C.mode==='day'?d:''}">＋ Termin erstellen</button><button class="btn" data-act="calNav" data-n="-1">‹</button><button class="btn" data-act="calNav" data-n="0">Heute</button><button class="btn" data-act="calNav" data-n="1">›</button>
+ ${['day','week','month'].map(m=>`<button class="btn ${C.mode===m?'navy':''}" data-act="calMode" data-m="${m}">${{day:'Tag',week:'Woche',month:'Monat'}[m]}</button>`).join('')}<b style="margin-left:8px">${esc(title)}</b></div>${body}
+ <div class="card"><h3>Kommende Termine</h3>${S.appointments.filter(a=>activeAppt(a)&&a.date>=T).sort((a,b)=>apptStart(a)-apptStart(b)).slice(0,10).map(a=>apptRow(a)).join('')||empty('Keine kommenden Termine.')}</div>`;
+}
+let deferredInstall=null,swInfo='nicht registriert';
+function pSettings(){
+ const P=S.prefs,perm='Notification'in window?Notification.permission:'nicht unterstützt';
+ const permTxt={granted:'✅ erlaubt',denied:'⛔ blockiert (in den Browser-/Systemeinstellungen ändern)',default:'⏳ noch nicht angefragt','nicht unterstützt':'❌ von diesem Browser nicht unterstützt'}[perm];
+ return `<div class="card"><h2>Vertriebsstatus bearbeiten</h2>${S.statuses.map((s,i)=>`<div class="row"><input type="color" value="${esc(s.color)}" data-change="stColor" data-id="${s.id}" style="width:46px;padding:2px"><input value="${esc(s.name)}" data-change="stName" data-id="${s.id}" style="flex:1;min-width:160px">
+ <select data-change="stKind" data-id="${s.id}" style="width:auto">${Object.entries(KINDS).map(([k,l])=>`<option value="${k}"${s.kind===k?' selected':''}>${l}</option>`).join('')}</select>
+ <button class="btn sm" data-act="stUp" data-i="${i}">↑</button><button class="btn sm" data-act="stDn" data-i="${i}">↓</button><button class="btn sm dan" data-act="stDel" data-id="${s.id}">🗑</button></div>`).join('')}
+ <div class="acts" style="justify-content:flex-start"><button class="btn" data-act="stAdd">＋ Status hinzufügen</button></div><p class="muted sm">„Art“ steuert die Dashboard-Kennzahlen (laufend = offene Verkaufschance, gewonnen, verloren, zurückgestellt).</p></div>
+ <div class="card"><h2>🔔 Erinnerungen &amp; Benachrichtigungen</h2>
+ <div class="dl"><div><span>Verbindung</span>${navigator.onLine?'online':'offline'}</div><div><span>Benachrichtigungs-Berechtigung</span>${permTxt}</div><div><span>Service Worker (Offline-Cache)</span>${esc(swInfo)}</div><div><span>Web Push (Server)</span>nicht eingerichtet – kein Server in dieser Version</div></div>
+ <div class="filters" style="margin-top:10px"><button class="btn pri" data-act="notifEnable">Benachrichtigungen aktivieren</button><button class="btn" data-act="notifTest">Testbenachrichtigung</button></div>
+ <div class="fg"><label class="f"><span>Vorlaufzeit vor Rückruf mit Uhrzeit (Min.)</span><input type="number" min="0" max="1440" value="${P.leadMin}" data-change="pref_leadMin"></label>
+ <label class="f"><span>Erinnerungszeit bei Aufgaben ohne Uhrzeit</span><input type="time" value="${P.dayTime}" data-change="pref_dayTime"></label>
+ <label class="f"><span>Überfällige wiederholt erinnern alle … Min. (0 = aus)</span><input type="number" min="0" max="1440" value="${P.overdueMin}" data-change="pref_overdueMin"></label>
+ <label class="f chk"><input type="checkbox" ${P.quietOn?'checked':''} data-change="pref_quietOn"><span>Ruhezeiten aktiv (Erinnerungen werden danach nachgeholt)</span></label>
+ <label class="f"><span>Ruhezeit von</span><input type="time" value="${P.quietFrom}" data-change="pref_quietFrom"></label><label class="f"><span>Ruhezeit bis</span><input type="time" value="${P.quietTo}" data-change="pref_quietTo"></label></div>
+ <div class="hint"><b>Was technisch möglich ist:</b><br>① <b>Bei geöffneter App</b> (auch im Hintergrund-Tab, solange der Browser sie nicht beendet): Erinnerung als Hinweis in der App und – wenn erlaubt – als System-Benachrichtigung. Verpasste Erinnerungen der letzten 24 Std. werden beim nächsten Öffnen nachgeholt.<br>
+ ② <b>Bei geschlossener App ohne Internet:</b> Browser erlauben keinem Service Worker beliebige Hintergrund-Timer. Zuverlässig geht das nur über die <b>Kalender-App des Handys</b>: Mit „📅“ an Rückruf/Aufgabe/Termin (oder „Alle offenen“) wird eine .ics-Datei mit Alarm erzeugt, die du in den Kalender importierst.<br>
+ ③ <b>Push bei geschlossener App</b> braucht einen Server (VAPID-Schlüssel, Push-Dienst) und Internet – hier nicht eingerichtet, siehe README.</div></div>
+ <div class="card"><h2>💾 Daten, Backup &amp; Sicherheit</h2>
+ <p>Alle Kundendaten liegen <b>ausschließlich lokal in der IndexedDB dieses Browsers/Geräts</b>. Es werden keine Daten an einen Server übertragen. Gerät zurücksetzen oder Browserdaten löschen = Daten weg, <b>wenn kein Backup existiert</b>.</p>
+ <div class="dl"><div><span>Datensätze</span>${S.customers.length} Kunden · ${S.tasks.length} Aufgaben · ${S.appointments.length} Termine · ${S.projects.length} Projekte · ${S.activities.length} Aktivitäten</div><div><span>Letztes Backup</span>${S.meta.lastBackup?fTs(S.meta.lastBackup):'<b class="red">noch nie</b>'}</div><div><span>Dauerhafter Speicher</span><span id="persistState">wird geprüft …</span></div></div>
+ <div class="filters" style="margin-top:10px"><button class="btn pri" data-act="backupShare">📤 Backup teilen (Drive / Dateien / E-Mail)</button><button class="btn" data-act="backupExport">⬇ Backup herunterladen</button><label class="btn">⬆ Backup einspielen / Geräte abgleichen<input type="file" accept="application/json,.json" data-change="backupFile" hidden></label><button class="btn" data-act="persist">Dauerhaften Speicher anfordern</button><button class="btn" data-act="icsAll">📅 Alle offenen Termine/Aufgaben als .ics</button></div>
+ <div class="hint"><b>Abgleich PC ↔ Smartphone (manuell):</b> Backup auf Gerät A erstellen → Datei auf Gerät B einspielen. Es wird zusammengeführt (je Datensatz gewinnt die neuere Änderung; Löschungen werden über Löschvermerke übernommen). Eine automatische Synchronisierung benötigt einen Server – siehe README.</div>
+ <div class="filters"><button class="btn" data-act="setPin">${P.pinHash?'App-PIN ändern':'App-PIN setzen'}</button>${P.pinHash?'<button class="btn" data-act="lock">Jetzt sperren</button><button class="btn dan" data-act="rmPin">PIN entfernen</button>':''}</div>
+ <p class="muted sm">Die PIN sperrt nur die Oberfläche; sie verschlüsselt die Daten nicht. Nutze zusätzlich Geräte-Sperre und Festplatten-/Gerätverschlüsselung.</p></div>
+ <div class="card"><h2>📲 Installation</h2><p class="sm">Android/Chrome &amp; PC: Menü → „App installieren“ ${deferredInstall?'– <button class="btn sm pri" data-act="install">Jetzt installieren</button>':''}. iPhone/Safari: Teilen → „Zum Home-Bildschirm“. Offline-Start funktioniert nur, wenn die App über HTTPS (oder localhost) ausgeliefert wird.</p></div>
+ <div class="card"><h2>Demo- &amp; Löschfunktionen</h2><div class="filters"><button class="btn" data-act="demoLoad">Demodaten laden</button><button class="btn" data-act="demoRemove">Demodaten entfernen</button><button class="btn dan" data-act="wipe">Alle Daten dieses Geräts löschen</button></div>
+ <p class="muted sm">DSGVO: Einzelne Kunden können in der Kundenakte exportiert (Auskunft) und endgültig gelöscht werden. Löschfristen legst du organisatorisch fest (z. B. Archiv prüfen &amp; löschen). Dies ist keine Rechtsberatung.</p></div>`;
+}
+
+/* ============ Router / render ============ */
+const NAV=[['dashboard','🏠','Dashboard'],['followups','📞','Rückrufe'],['customers','👥','Kunden'],['pipeline','📊','Pipeline'],['appointments','📅','Termine'],['tasks','✅','Aufgaben'],['settings','⚙️','Einstellungen']];
+function render(){
+ if(!db)return;
+ const [,page='dashboard',a,b]=(location.hash||'#/dashboard').split('/');
+ const nOd=S.tasks.filter(t=>isOpen(t)&&t.kind==='callback'&&overdue(t)).length;
+ $('#side').innerHTML=`<div class="logo">☀ PV<span>-CRM</span></div>${NAV.map(([k,i,l])=>`<a href="#/${k}" class="${page===k||(page==='customer'&&k==='customers')?'on':''}"><span>${i}</span><span>${l}</span>${k==='followups'&&nOd?`<span class="n">${nOd}</span>`:''}</a>`).join('')}<div class="foot">Daten nur lokal gespeichert</div>`;
+ const P={dashboard:[ 'Dashboard',pDashboard],followups:['Rückrufe & Wiedervorlagen',pFollowups],customers:['Kunden',pCustomers],customer:['Kundenakte',()=>pCustomer(a,b)],pipeline:['Vertriebspipeline',pPipeline],appointments:['Termine',pAppointments],tasks:['Aufgaben',pTasks],settings:['Einstellungen',pSettings]}[page]||['Dashboard',pDashboard];
+ $('#title').textContent=page==='customer'&&cust(a)?cname(cust(a)):P[0];
+ const main=$('#main'),sy=window.scrollY;main.innerHTML=P[1]();if(page==='settings')persistInfo();
+}
+async function persistInfo(){const el=$('#persistState');if(!el)return;try{el.textContent=navigator.storage&&navigator.storage.persisted?((await navigator.storage.persisted())?'✅ gesichert (vom Browser zugesagt)':'⚠ nicht zugesagt – Browser könnte Daten bei Speicherdruck löschen'):'unbekannt'}catch{el.textContent='unbekannt'}}
+window.addEventListener('hashchange',()=>{render();window.scrollTo(0,0)});
+const netUI=()=>{const n=$('#net');n.textContent=navigator.onLine?'online':'offline';n.className='pill '+(navigator.onLine?'on':'off')};
+addEventListener('online',netUI);addEventListener('offline',netUI);
+
+/* ============ Actions ============ */
+const A={
+ newCustomer:()=>customerDialog(),editCustomer:el=>customerDialog(el.dataset.id),
+ delCustomer:async el=>{const c=cust(el.dataset.id);if(!confirm(`„${cname(c)}“ mit allen Aufgaben, Terminen, Projekten und Aktivitäten ENDGÜLTIG löschen?\n(Tipp: Archivieren ist umkehrbar. Exportiere vorher ggf. die Daten.)`))return;await deleteCustomer(c.id);toast('Kunde gelöscht.');location.hash='#/customers'},
+ archCustomer:async el=>{const c=cust(el.dataset.id);c.archived=!c.archived;await save('customers',c);await log(c.id,'note',c.archived?'Archiviert':'Wiederhergestellt');toast(c.archived?'Archiviert.':'Wiederhergestellt.');render()},
+ favCustomer:async el=>{const c=cust(el.dataset.id);c.favorite=!c.favorite;await save('customers',c);render()},
+ exportOne:el=>{const id=el.dataset.id;download(`kunde-${id.slice(0,8)}-${today()}.json`,JSON.stringify({customer:cust(id),projects:S.projects.filter(x=>x.customerId===id),tasks:S.tasks.filter(x=>x.customerId===id),appointments:S.appointments.filter(x=>x.customerId===id),activities:S.activities.filter(x=>x.customerId===id)},null,1),'application/json')},
+ logCall:el=>callDialog(el.dataset.cid),planCb:el=>taskDialog('callback',null,el.dataset.cid),newTask:el=>taskDialog('task',null,el.dataset.cid),editTask:el=>taskDialog(null,el.dataset.id),
+ doneTask:async el=>{const t=S.tasks.find(x=>x.id===el.dataset.id);if(t.kind==='callback'&&t.customerId)return callDialog(t.customerId,t.id);t.status='done';t.doneAt=Date.now();await save('tasks',t);if(t.customerId)await log(t.customerId,'task','Aufgabe erledigt: '+taskTitle(t));toast('Aufgabe erledigt.');render()},
+ delTask:async el=>{if(!confirm('Eintrag wirklich löschen? (Erledigen statt Löschen erhält die Historie.)'))return;await remove('tasks',el.dataset.id);render()},
+ newAppt:el=>apptDialog(null,el.dataset.cid,el.dataset.d||''),editAppt:el=>apptDialog(el.dataset.id),
+ delAppt:async el=>{if(!confirm('Termin löschen?'))return;await remove('appointments',el.dataset.id);render()},
+ newProject:el=>projectDialog(null,el.dataset.cid),editProject:el=>projectDialog(el.dataset.id),delProject:async el=>{if(!confirm('Projekt löschen?'))return;await remove('projects',el.dataset.id);render()},
+ addNote:async el=>{const tx=$('#nText').value.trim();if(!tx)return toast('Bitte Text eingeben.','error');await log(el.dataset.id,$('#nType').value,tx,$('#nRes').value);toast('Eintrag gespeichert.');render()},
+ delNote:async el=>{if(!confirm('Eintrag löschen?'))return;await remove('activities',el.dataset.id);render()},
+ tasksTab:el=>{UI.tasksTab=el.dataset.k;render()},
+ calNav:el=>{const n=+el.dataset.n,C=UI.cal;if(!n)C.date=today();else C.date=C.mode==='month'?(()=>{const d=new Date(C.date+'T12:00');d.setDate(1);d.setMonth(d.getMonth()+n);return ymd(d)})():addDays(C.date,n*(C.mode==='week'?7:1));render()},
+ calMode:el=>{UI.cal.mode=el.dataset.m;render()},calDay:el=>{UI.cal.date=el.dataset.d;UI.cal.mode='day';render()},
+ preset:el=>{const f=el.closest('form'),n=$(`[name=${el.dataset.f||'date'}]`,f);if(n)n.value=addDays(today(),+el.dataset.days)},
+ saveView:async()=>{const name=prompt('Name der Ansicht:');if(!name)return;const {q,status,source,prio,due,sort,fav,arch}=UI.cust;S.prefs.views=[...(S.prefs.views||[]),{name,f:{q,status,source,prio,due,sort,fav,arch}}];await setSet('prefs',S.prefs);toast('Ansicht gespeichert.');render()},
+ delViews:async()=>{if(!confirm('Alle gespeicherten Ansichten löschen?'))return;S.prefs.views=[];await setSet('prefs',S.prefs);render()},
+ resetFilters:()=>{Object.assign(UI.cust,{q:'',status:'',source:'',prio:'',due:'',sort:'name',fav:false,arch:false});UI.cust.sel.clear();render()},
+ exportCSV:()=>exportCSV(filteredCustomers().map(x=>x.c)),bulkExport:()=>exportCSV(S.customers.filter(c=>UI.cust.sel.has(c.id))),bulkClear:()=>{UI.cust.sel.clear();render()},
+ bulkArch:async()=>{for(const id of UI.cust.sel){const c=cust(id);c.archived=true;await save('customers',c)}toast(UI.cust.sel.size+' archiviert.');UI.cust.sel.clear();render()},
+ stAdd:async()=>{S.statuses.push({id:'s'+uid().slice(0,8),name:'Neuer Status',kind:'open',color:'#3b82f6'});await setSet('statuses',S.statuses);render()},
+ stDel:async el=>{if(S.customers.some(c=>c.statusId===el.dataset.id))return toast('Status wird noch von Kunden verwendet – diese zuerst umstellen.','error');S.statuses=S.statuses.filter(s=>s.id!==el.dataset.id);await setSet('statuses',S.statuses);render()},
+ stUp:async el=>{const i=+el.dataset.i;if(i>0){[S.statuses[i-1],S.statuses[i]]=[S.statuses[i],S.statuses[i-1]];await setSet('statuses',S.statuses);render()}},
+ stDn:async el=>{const i=+el.dataset.i;if(i<S.statuses.length-1){[S.statuses[i+1],S.statuses[i]]=[S.statuses[i],S.statuses[i+1]];await setSet('statuses',S.statuses);render()}},
+ notifEnable:async()=>{if(!('Notification'in window))return toast('Dieser Browser unterstützt keine Benachrichtigungen.','error');const r=await Notification.requestPermission();toast(r==='granted'?'Benachrichtigungen erlaubt.':'Berechtigung: '+r,r==='granted'?'ok':'error');render()},
+ notifTest:async()=>{if(Notification.permission!=='granted')toast('Hinweis: Systembenachrichtigungen sind nicht erlaubt – nur In-App-Hinweis.','info');await notify({key:'test:'+Date.now(),title:'🔔 Testbenachrichtigung',body:'PV-CRM Erinnerungen funktionieren.',url:'#/settings'})},
+ backupExport,backupShare:async()=>{const f=new File([JSON.stringify(backupData(),null,1)],`pv-crm-backup-${today()}.json`,{type:'application/json'});if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f],title:'PV-CRM Backup'});S.meta.lastBackup=Date.now();await setSet('meta',S.meta);toast('Backup geteilt.');render()}catch(e){if(e.name!=='AbortError')toast('Teilen fehlgeschlagen: '+e.message,'error')}}else{toast('Teilen wird hier nicht unterstützt – Datei wird heruntergeladen.','info');await backupExport()}},persist:async()=>{try{const ok=navigator.storage&&navigator.storage.persist&&await navigator.storage.persist();toast(ok?'Dauerhafter Speicher zugesagt.':'Der Browser hat dauerhaften Speicher nicht zugesagt (bei installierter App meist möglich).',ok?'ok':'info',7000)}catch{toast('Nicht unterstützt.','error')}render()},
+ icsTask:el=>{const t=S.tasks.find(x=>x.id===el.dataset.id);download('aufgabe.ics',icsFile([taskIcs(t)]),'text/calendar')},
+ icsAppt:el=>{const a=S.appointments.find(x=>x.id===el.dataset.id);download('termin.ics',icsFile([apptIcs(a)]),'text/calendar')},
+ icsAll:()=>{const ev=[...S.tasks.filter(isOpen).map(taskIcs),...S.appointments.filter(a=>activeAppt(a)&&a.date>=today()).map(apptIcs)];if(!ev.length)return toast('Nichts zu exportieren.','info');download('pv-crm-erinnerungen.ics',icsFile(ev),'text/calendar');toast(ev.length+' Einträge exportiert – Datei in die Kalender-App importieren.')},
+ install:async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;render()},
+ setPin:()=>modal('App-PIN',`${F('p1','Neue PIN (mind. 4 Zeichen)','',{t:'password'})}${F('p2','PIN wiederholen','',{t:'password'})}`,async fd=>{const p=fdv(fd,'p1');if(p.length<4||p!==fdv(fd,'p2'))throw new Error('PIN zu kurz oder Eingaben unterschiedlich.');const salt=uid();S.prefs.pinSalt=salt;S.prefs.pinHash=await sha(salt+p);await setSet('prefs',S.prefs);toast('PIN gesetzt.');render()}),
+ rmPin:async()=>{delete S.prefs.pinHash;delete S.prefs.pinSalt;await setSet('prefs',S.prefs);toast('PIN entfernt.');render()},lock:()=>showLock(),
+ demoLoad:async()=>{await loadDemo();toast('Demodaten geladen.');render()},
+ demoRemove:async()=>{for(const c of S.customers.filter(c=>c.demo))await deleteCustomer(c.id);toast('Demodaten entfernt.');render()},
+ wipe:async()=>{if(!confirm('ALLE Daten auf diesem Gerät unwiderruflich löschen?')||prompt('Zur Bestätigung „LÖSCHEN“ eingeben:')!=='LÖSCHEN')return;for(const s of ['customers','projects','tasks','appointments','activities'])for(const o of S[s])await dbDel(s,o.id);S.tomb=[];await setSet('tomb',[]);await load();toast('Alle Daten gelöscht.');render()}
+};
+async function deleteCustomer(id){for(const [s,k] of [['tasks','customerId'],['appointments','customerId'],['projects','customerId'],['activities','customerId']])for(const o of S[s].filter(x=>x[k]===id))await remove(s,o.id);await remove('customers',id)}
+const sha=async s=>[...new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s)))].map(b=>b.toString(16).padStart(2,'0')).join('');
+
+const CH={
+ selAll:el=>{const l=filteredCustomers();l.forEach(x=>el.checked?UI.cust.sel.add(x.c.id):UI.cust.sel.delete(x.c.id));refreshList()},
+ sel:el=>{el.checked?UI.cust.sel.add(el.dataset.id):UI.cust.sel.delete(el.dataset.id);$('#bulk').innerHTML=bulkBar()},
+ f_status:v=>{UI.cust.status=v.value;refreshList()},f_source:v=>{UI.cust.source=v.value;refreshList()},f_prio:v=>{UI.cust.prio=v.value;refreshList()},f_due:v=>{UI.cust.due=v.value;refreshList()},f_sort:v=>{UI.cust.sort=v.value;refreshList()},
+ f_fav:v=>{UI.cust.fav=v.checked;refreshList()},f_arch:v=>{UI.cust.arch=v.checked;refreshList()},
+ applyView:el=>{const v=(S.prefs.views||[])[+el.value];if(v){Object.assign(UI.cust,v.f);render()}},
+ csvFile:el=>{if(el.files[0])importCSV(el.files[0]);el.value=''},backupFile:el=>{if(el.files[0])backupImport(el.files[0]);el.value=''},
+ bulkStatus:async el=>{if(!el.value)return;for(const id of UI.cust.sel)await setStatus(id,el.value);UI.cust.sel.clear();render()},
+ custStatus:el=>askStatus(el.dataset.id,el.value),
+ notes:async el=>{const c=cust(el.dataset.id);if(c.notes===el.value)return;c.notes=el.value;await save('customers',c);toast('Notiz gespeichert.')},
+ stName:async el=>{const s=S.statuses.find(x=>x.id===el.dataset.id);if(!el.value.trim())return render();s.name=el.value.trim();await setSet('statuses',S.statuses);toast('Gespeichert.')},
+ stColor:async el=>{S.statuses.find(x=>x.id===el.dataset.id).color=el.value;await setSet('statuses',S.statuses)},
+ stKind:async el=>{S.statuses.find(x=>x.id===el.dataset.id).kind=el.value;await setSet('statuses',S.statuses);toast('Gespeichert.')}
+};
+function refreshList(){$('#custTable').innerHTML=custTable();$('#bulk').innerHTML=bulkBar()}
+document.addEventListener('click',e=>{const el=e.target.closest('[data-act]');if(!el)return;const f=A[el.dataset.act];if(f){if(el.tagName==='A'&&el.getAttribute('href')==='javascript:void 0')e.preventDefault();Promise.resolve(f(el,e)).catch(x=>{console.error(x);toast('Fehler: '+x.message,'error')})}});
+document.addEventListener('change',e=>{const el=e.target.closest('[data-change]');if(!el)return;const k=el.dataset.change;
+ if(k.startsWith('pref_')){const key=k.slice(5);S.prefs[key]=el.type==='checkbox'?el.checked:el.type==='number'?Number(el.value)||0:el.value;setSet('prefs',S.prefs).then(()=>toast('Gespeichert.'));return}
+ CH[k]&&Promise.resolve(CH[k](el)).catch(x=>{console.error(x);toast('Fehler: '+x.message,'error')})});
+document.addEventListener('input',e=>{if(e.target.dataset.input==='q'){UI.cust.q=e.target.value;refreshList()}});
+/* Pipeline drag & drop */
+document.addEventListener('dragstart',e=>{const k=e.target.closest&&e.target.closest('[data-drag]');if(k){e.dataTransfer.setData('text/plain',k.dataset.drag);e.dataTransfer.effectAllowed='move'}});
+document.addEventListener('dragover',e=>{const c=e.target.closest&&e.target.closest('[data-drop]');if(c){e.preventDefault();c.classList.add('over')}});
+document.addEventListener('dragleave',e=>{const c=e.target.closest&&e.target.closest('[data-drop]');if(c)c.classList.remove('over')});
+document.addEventListener('drop',e=>{const c=e.target.closest&&e.target.closest('[data-drop]');if(!c)return;e.preventDefault();c.classList.remove('over');const id=e.dataTransfer.getData('text/plain');if(id)askStatus(id,c.dataset.drop)});
+
+/* ============ Lock ============ */
+function showLock(){const L=$('#lock');L.hidden=false;L.innerHTML=`<div style="font-size:42px">☀</div><h2>PV-CRM gesperrt</h2><input id="pin" type="password" placeholder="PIN" style="max-width:220px;text-align:center" autocomplete="off"><div id="lerr" class="warn"></div><button class="btn pri" id="unl">Entsperren</button>`;
+ const go=async()=>{if(await sha(S.prefs.pinSalt+$('#pin').value)===S.prefs.pinHash){L.hidden=true;L.innerHTML=''}else{$('#lerr').textContent='Falsche PIN.';$('#pin').value=''}};$('#unl').onclick=go;$('#pin').onkeydown=e=>{if(e.key==='Enter')go()};$('#pin').focus()}
+
+/* ============ Demo data ============ */
+async function loadDemo(){
+ const T=today(),D=[['Anna','Beispiel','Musterstadt','80331','0171 1234567','s4',9800,'Website'],['Bernd','Demo','Beispielheim','50667','0221 123456','s10',4200,'Empfehlung'],['Clara','Testfrau','Demoburg','10115','030 123456','s1',6100,'Werbung'],['Dieter','Probst','Testhausen','70173','0711 123456','s7',12500,'Telefonakquise'],['Eva','Muster','Musterstadt','80331','0172 7654321','s13',5400,'Partner']];
+ for(const [i,x] of D.entries()){const c=await save('customers',{firstName:x[0],lastName:x[1],city:x[2],zip:x[3],street:'Musterweg '+(i+1),phone:x[4],type:'Privatkunde',statusId:x[5],consumption:x[6],source:x[7],buildingType:'Einfamilienhaus',ownership:'Eigentümer',demo:true,notes:'Demodatensatz'});
+  await log(c.id,'note','Demodatensatz angelegt');
+  if(i===0)await save('tasks',{kind:'callback',status:'open',customerId:c.id,contactType:'Anruf',reason:'Erneut versuchen',date:addDays(T,-1),time:'10:00',priority:'high',description:'Demo: überfällig'});
+  if(i===1)await save('tasks',{kind:'callback',status:'open',customerId:c.id,contactType:'Anruf',reason:'Nach Angebot fragen',date:T,time:'',window:'Nachmittag',priority:'normal',description:'Demo: heute fällig'});
+  if(i===2)await save('tasks',{kind:'callback',status:'open',customerId:c.id,contactType:'Anruf',reason:'Erstkontakt',date:addDays(T,1),time:'10:30',priority:'normal',description:'Demo: morgen'});
+  if(i===3){await save('appointments',{customerId:c.id,date:addDays(T,2),start:'14:00',end:'15:30',type:'Dachbesichtigung',status:'bestätigt',address:'Musterweg 4, 70173 Testhausen',remindMin:'60',prep:'Dachfläche messen'});await save('projects',{customerId:c.id,name:'PV 12 kWp + Speicher',value:28000,kwp:12,kwh:10,offerStatus:'Versendet',offerDate:T,demo:true})}
+  if(i===4)await save('projects',{customerId:c.id,name:'PV 8 kWp',value:14500,kwp:8,offerStatus:'Gewonnen',actualClose:T,demo:true})}
+}
+
+/* ============ Boot ============ */
+(async function boot(){
+ try{
+  db=await openDB();await load();netUI();
+  if(S.prefs.pinHash)showLock();
+  render();
+  if('serviceWorker'in navigator&&/^https?:$/.test(location.protocol)){
+   navigator.serviceWorker.register('sw.js').then(r=>{swInfo='aktiv – App ist offline startbar';if(location.hash.includes('settings'))render()}).catch(e=>{swInfo='nicht verfügbar ('+(e.message||e)+')'})}
+  else swInfo='nicht verfügbar (benötigt HTTPS/localhost und sw.js)';
+  addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e});
+  navigator.serviceWorker&&navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.url)location.hash=e.data.url});
+  checkReminders();setInterval(checkReminders,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)checkReminders()});
+  setInterval(()=>{if(!document.hidden&&!document.querySelector('dialog[open]'))render()},120000);
+ }catch(e){console.error(e);$('#main').innerHTML=`<div class="card"><h2>Datenbank nicht verfügbar</h2><p>IndexedDB konnte nicht geöffnet werden (${esc(e.message||e)}). Private Browser-Fenster oder blockierte Website-Daten verhindern die Speicherung.</p></div>`}
+})();
+</script>
+</body>
+</html>
